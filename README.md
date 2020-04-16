@@ -2,7 +2,7 @@
 
 This is a demo of how I would approach writing [Qt](https://www.qt.io/) code that communicates with an [MPD](https://www.musicpd.org/) server.
 
-I start with the standard CMake QWidgets boilerplate created by Qt Creator, and added a button to "list albums" All output from MPD goes into QDebug. The presentation layer is not what I'm demonstrating.
+I start with the standard CMake QWidgets boilerplate created by Qt Creator, and I add a button to "list albums" All output from MPD goes into QDebug. The presentation layer is not what I'm demonstrating.
 
 I use [libmpdclient](https://www.musicpd.org/libs/libmpdclient/) instead of trying to implement my own data access layer.
 
