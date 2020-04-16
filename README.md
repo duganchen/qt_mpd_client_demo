@@ -10,4 +10,6 @@ Using libmpdclient, I create two connection instances: one to synchronously send
 
 To know when idle notifications have arrived, I hook the asynchronous connection's file descriptor (which libmpdclient exposes) up to a [QSocketNotifier](https://doc.qt.io/qt-5/qsocketnotifier.html).
 
+Note that with this approach, I do not need to worry about parsing data sent from MPD (which, incidentally, is in a format that would parse extremely well with awk), escaping data sent to MPD (which MPD's documentation specifically advises against reimplementing), or multithreading.
+
 As for the Qt side? I start with the standard CMake QWidgets boilerplate created by Qt Creator, and I add a button to "list albums" All output from MPD goes into QDebug. The presentation layer is not what I'm demonstrating.
