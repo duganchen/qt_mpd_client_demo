@@ -8,7 +8,7 @@ I use [libmpdclient](https://www.musicpd.org/libs/libmpdclient/) instead of tryi
 
 In CMake, I specify the languages as both C (libmpdclient) and C++ (Qt), and I use pkgconfig to set up the libmpdclient dependencies.
 
-Using libmpdclient, I create two connection instances: one to synchronously send commands and immediately receive their output, and the other to asynchronously handle MPD "idle" command, which subscribes to push notifications. These are pointers to malloc'd C structs, so I wrap them in Qt's smart pointers. In this case: [QSharedPointer](https://doc.qt.io/qt-5/qsharedpointer.html)
+Using libmpdclient, I create two connection instances: one to synchronously send commands and immediately receive their output, and the other to asynchronously handle MPD "idle" command, which subscribes to push notifications. These are pointers to malloc'd C structs, so I wrap them in Qt's smart pointers. In this case: [QSharedPointer](https://doc.qt.io/qt-5/qsharedpointer.html).
 
 To know when idle notifications have arrived, I hook the asynchronous connection's file descriptor (which libmpdclient exposes) up to a [QSocketNotifier](https://doc.qt.io/qt-5/qsocketnotifier.html).
 
