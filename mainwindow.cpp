@@ -10,8 +10,21 @@ MainWindow::MainWindow(QSharedPointer<mpd_connection> commander, QSharedPointer<
     auto notifier = new QSocketNotifier(mpd_connection_get_fd(idler.data()), QSocketNotifier::Read, this);
 
     connect(notifier, &QSocketNotifier::activated, [=](){
-        qDebug() << mpd_idle_name(mpd_recv_idle(idler.data(), false));
-        mpd_send_idle(idler.data());
+        auto idle = mpd_recv_idle(idler.data(), false);
+        if (idle != 0)
+        {
+            qDebug() << mpd_idle_name(idle);
+            mpd_send_idle(idler.data());
+        }
+        else
+        {
+            if (mpd_connection_get_error(idler.data()) != MPD_ERROR_SUCCESS)
+            {
+                qDebug() << mpd_connection_get_error_message(idler.data());
+                delete notifier;
+            }
+        }
+
     });
 
     auto button = new QPushButton("&List Albums", this);
