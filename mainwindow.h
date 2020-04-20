@@ -5,13 +5,24 @@
 #include <QSocketNotifier>
 #include <mpd/client.h>
 #include <QMainWindow>
+#include "mpdconnection.h"
+#include <QPushButton>
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QSharedPointer<mpd_connection> commander, QSharedPointer<mpd_connection> idler, QWidget *parent = nullptr);
+    MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWidget *parent = nullptr);
     ~MainWindow();
+public slots:
+    void listAlbums();
+    void recvNotification();
+private:
+    const char *m_host;
+    unsigned m_port;
+    unsigned m_timeout_ms;
+    MPDConnection *m_mpd;
+    QPushButton *albumListButton;
 };
 #endif // MAINWINDOW_H

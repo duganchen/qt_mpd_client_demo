@@ -3,44 +3,64 @@
 #include <QPushButton>
 #include "mainwindow.h"
 
-MainWindow::MainWindow(QSharedPointer<mpd_connection> commander, QSharedPointer<mpd_connection> idler, QWidget *parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWidget *parent)
+    : QMainWindow(parent), m_host(host), m_port(port), m_timeout_ms(timeout_ms), m_mpd(nullptr), albumListButton(nullptr)
 {
-    mpd_send_idle(idler.data());
-    auto notifier = new QSocketNotifier(mpd_connection_get_fd(idler.data()), QSocketNotifier::Read, this);
+    setEnabled(false);
 
-    connect(notifier, &QSocketNotifier::activated, [=](){
-        auto idle = mpd_recv_idle(idler.data(), false);
-        if (idle != 0)
-        {
-            qDebug() << mpd_idle_name(idle);
-            mpd_send_idle(idler.data());
-        }
-        else
-        {
-            if (mpd_connection_get_error(idler.data()) != MPD_ERROR_SUCCESS)
-            {
-                qDebug() << mpd_connection_get_error_message(idler.data());
-                delete notifier;
-            }
-        }
+    albumListButton = new QPushButton("&List Albums", this);
+    connect(albumListButton, &QPushButton::clicked, this, &MainWindow::listAlbums);
+    setCentralWidget(albumListButton);
 
-    });
+    m_mpd = new MPDConnection(m_host, m_port, m_timeout_ms, this);
+    if (m_mpd->isNull())
+    {
+        qDebug() << "Cannot allocate MPD connection.";
+        return;
+    }
 
-    auto button = new QPushButton("&List Albums", this);
-    connect(button, &QPushButton::clicked, [=](){
-        mpd_search_db_tags(commander.data(), MPD_TAG_ALBUM);
-        mpd_search_commit(commander.data());
+    if (m_mpd->error() != MPD_ERROR_SUCCESS)
+    {
+        qDebug() << m_mpd->errorMessage();
+        return;
+    }
 
-        struct mpd_pair *pair;
-        while ((pair = mpd_recv_pair_tag(commander.data(), MPD_TAG_ALBUM)) != nullptr)
-        {
-            qDebug() << pair->value;
-            mpd_return_pair(commander.data(), pair);
-        }
-    });
-    setCentralWidget(button);
+    setEnabled(true);
+
+    connect(m_mpd, &MPDConnection::activated, this, &MainWindow::recvNotification);
+
+
+    m_mpd->sendIdle();
 }
+
+
+void MainWindow::recvNotification()
+{
+    auto idle = m_mpd->recvIdle(false);
+    if (idle != 0)
+    {
+        qDebug() << MPDConnection::idleName(idle);
+        m_mpd->sendIdle();
+    }
+    else if (m_mpd->error() != MPD_ERROR_SUCCESS)
+    {
+        qDebug() << m_mpd->errorMessage();
+        setEnabled(false);
+
+        m_mpd->deleteLater();
+    }
+}
+
+void MainWindow::listAlbums()
+{
+    m_mpd->searchDBTags(MPD_TAG_ALBUM);
+    m_mpd->searchCommit();
+    for (auto pair: m_mpd->recvPairTags(MPD_TAG_ALBUM))
+    {
+        qDebug() << pair.second;
+    }
+}
+
 
 MainWindow::~MainWindow()
 {

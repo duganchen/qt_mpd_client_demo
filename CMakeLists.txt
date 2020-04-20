@@ -19,7 +19,7 @@ pkg_check_modules(LIBMPDCLIENT REQUIRED IMPORTED_TARGET libmpdclient)
 add_executable(qt_mpd_test
   main.cpp
   mainwindow.cpp
-  mainwindow.h
+  mpdconnection.cpp
 )
 
 target_include_directories(qt_mpd_test PRIVATE ${LIBMPDCLIENT_INCLUDE_DIRS})
