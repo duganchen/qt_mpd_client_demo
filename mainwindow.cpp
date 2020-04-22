@@ -1,36 +1,44 @@
 #include <mpd/client.h>
 #include <QDebug>
 #include <QPushButton>
+#include <QtNetwork/QHostInfo>
 #include "mainwindow.h"
 
 MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWidget *parent)
     : QMainWindow(parent), m_host(host), m_port(port), m_timeout_ms(timeout_ms), m_mpd(nullptr), albumListButton(nullptr)
 {
-    setEnabled(false);
-
     albumListButton = new QPushButton("&List Albums", this);
     connect(albumListButton, &QPushButton::clicked, this, &MainWindow::listAlbums);
     setCentralWidget(albumListButton);
 
-    m_mpd = new MPDConnection(m_host, m_port, m_timeout_ms, this);
-    if (m_mpd->isNull())
-    {
-        qDebug() << "Cannot allocate MPD connection.";
-        return;
-    }
+    setEnabled(false);
 
-    if (m_mpd->error() != MPD_ERROR_SUCCESS)
-    {
-        qDebug() << m_mpd->errorMessage();
-        return;
-    }
+    QHostInfo::lookupHost(m_host, this, [=](QHostInfo info){
+        if (info.error() != QHostInfo::NoError)
+        {
+            qDebug() << info.errorString();
+            return;
+        }
 
-    setEnabled(true);
+        m_mpd = new MPDConnection(m_host, m_port, m_timeout_ms, this);
+        if (m_mpd->isNull())
+        {
+            qDebug() << "Cannot allocate MPD connection.";
+            return;
+        }
 
-    connect(m_mpd, &MPDConnection::activated, this, &MainWindow::recvNotification);
+        if (m_mpd->error() != MPD_ERROR_SUCCESS)
+        {
+            qDebug() << m_mpd->errorMessage();
+            return;
+        }
 
+        setEnabled(true);
 
-    m_mpd->sendIdle();
+        connect(m_mpd, &MPDConnection::activated, this, &MainWindow::recvNotification);
+
+        m_mpd->sendIdle();
+    });
 }
 
 
