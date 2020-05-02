@@ -44,10 +44,70 @@ MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWi
 
 void MainWindow::recvNotification()
 {
+    qDebug() << "RECEIVING NOTIFICATION";
     auto idle = m_mpd->recvIdle(false);
     if (idle != 0)
     {
-        qDebug() << MPDConnection::idleName(idle);
+        if (idle & MPD_IDLE_DATABASE)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_DATABASE);
+        }
+
+        if (idle & MPD_IDLE_STORED_PLAYLIST)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_STORED_PLAYLIST);
+        }
+
+        if (idle & MPD_IDLE_QUEUE)
+        {
+            qDebug() << "queue " << mpd_idle_name(MPD_IDLE_QUEUE);
+        }
+
+        if (idle & MPD_IDLE_PLAYLIST)
+        {
+            qDebug() << "playlist " << mpd_idle_name(MPD_IDLE_PLAYLIST);
+        }
+
+        if (idle & MPD_IDLE_PLAYER)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_PLAYER);
+        }
+
+        if (idle & MPD_IDLE_MIXER)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_MIXER);
+        }
+
+        if (idle & MPD_IDLE_OUTPUT)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_OUTPUT);
+        }
+
+        if (idle & MPD_IDLE_OPTIONS)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_OPTIONS);
+        }
+
+        if (idle & MPD_IDLE_UPDATE)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_UPDATE);
+        }
+
+        if (idle & MPD_IDLE_STICKER)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_STICKER);
+        }
+
+        if (idle & MPD_IDLE_SUBSCRIPTION)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_SUBSCRIPTION);
+        }
+
+        if (idle & MPD_IDLE_MESSAGE)
+        {
+            qDebug() << mpd_idle_name(MPD_IDLE_MESSAGE);
+        }
+
         m_mpd->sendIdle();
     }
     else if (m_mpd->error() != MPD_ERROR_SUCCESS)
