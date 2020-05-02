@@ -60,12 +60,7 @@ void MainWindow::recvNotification()
 
         if (idle & MPD_IDLE_QUEUE)
         {
-            qDebug() << "queue " << mpd_idle_name(MPD_IDLE_QUEUE);
-        }
-
-        if (idle & MPD_IDLE_PLAYLIST)
-        {
-            qDebug() << "playlist " << mpd_idle_name(MPD_IDLE_PLAYLIST);
+            qDebug() << mpd_idle_name(MPD_IDLE_QUEUE);
         }
 
         if (idle & MPD_IDLE_PLAYER)
