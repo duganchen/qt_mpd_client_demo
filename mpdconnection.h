@@ -22,11 +22,13 @@ public:
     bool sendIdle();
     enum mpd_idle recvIdle(bool);
     static QString idleName(enum mpd_idle);
+    mpd_idle runNoIdle();
+
+    void setNotifierEnabled(bool);
 signals:
     void activated();
 private:
-    struct mpd_connection *m_commander;
-    struct mpd_connection *m_idler;
+    struct mpd_connection *m_mpd;
     QSocketNotifier *m_notifier;
 };
 

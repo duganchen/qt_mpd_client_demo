@@ -18,6 +18,7 @@ public:
 public slots:
     void listAlbums();
     void recvNotification();
+    void handleNotification(mpd_idle);
 private:
     const char *m_host;
     unsigned m_port;

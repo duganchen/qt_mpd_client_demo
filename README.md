@@ -2,18 +2,43 @@
 
 This is a demo of how I would approach writing [Qt](https://www.qt.io/) code that communicates with an [MPD](https://www.musicpd.org/) server.
 
-I use [libmpdclient](https://www.musicpd.org/libs/libmpdclient/) instead of trying to implement my own data access layer.
+I use [libmpdclient](https://www.musicpd.org/libs/libmpdclient/) instead of trying to implement my own data access layer, whose scope would typically include connecting to MPD via a socket, [escaping commands sent to MPD](https://www.musicpd.org/doc/html/protocol.html#escaping-string-values), and parsing MPD's output .
 
-In CMake, I specify the languages as both C (libmpdclient) and C++ (Qt), and I use pkgconfig to set up the libmpdclient dependencies.
+In CMake, I specify the languages as both C (libmpdclient) and C++ (Qt). I tell CMake to use pkgconfig to locate libmpdclient.
 
-Using libmpdclient, I create two connection instances: one to synchronously send commands and immediately receive their output, and the other to asynchronously handle MPD "idle" command, which subscribes to push notifications. These are pointers to malloc'd C structs, so I allow a QObject to control their lifecycle.
+The proper way to integrate MPD into a program's architecture is described as follows:
+
+> mpd_send_idle(), then register libmpdclient's socket (see
+> mpd_connection_get_fd()) in your I/O event loop.
+>
+> As soon as MPD sends the result, your event loop triggers your
+> callback, and you can use mpd_recv_idle() to read the result.  After
+> you're done handling those idle events, re-enter idle.
+>
+> If you want to interact with MPD in the meantime, call
+> mpd_run_noidle() and handle idle events which may have occurred; then
+> send the desired commands to MPD.  Finally re-enter idle.
+>
+> This is not magic.  And it's not specific to MPD.  This is basic
+> event-based programming.  Just one connection and one thread, no
+> latencies, no timeouts, no waiting.
+
+[Re: \[mpd-devel] Proper Use of IDLE](https://www.mail-archive.com/mpd-devel@musicpd.org/msg00641.html)
+
+Using libmpdclient, I create a single connection.
 
 To know when idle notifications have arrived, I hook the asynchronous connection's file descriptor (which libmpdclient exposes) up to a [QSocketNotifier](https://doc.qt.io/qt-5/qsocketnotifier.html).
 
-The QObject subclass is therefore a Facade that coordinates two mpd_connections and a QSocketNotifier. Need a new MPD connection? Delete it and instantiate a new one.
+Idle notifications are received asynchronously, and commands are sent and received synchronously. When I need to send a command, the process is:
 
-If you try to create an mpd_connection instance with a host that can't be resolved (say, if you typo localhost as locahost), then the mpd_connection_new call can block for a long time. How to handle that? Honestly, I just use [QHostInfo](https://doc.qt.io/qt-5/qhostinfo.html) to asynchronously check that the host is resolvable first.
+1. disable the socket notifier
+2. send noidle, receive and process the results
+3. send the command and receive the results
+4. turn the socket notifier back on
+5. send idle
 
-Note that with this approach, I do not need to worry about parsing data sent from MPD (which, incidentally, is in a format that would parse extremely well with awk), escaping data sent to MPD (which MPD's documentation specifically advises against reimplementing), or multithreading. It also takes care of, as far as I can tell, every case where blocking would actually be a problem.
+For reconnections? One option is to make both the MPD connection instance and the socket notifier and instance of a Facade class. When you need a new connection, free it and instantiate a new one.
+
+With this setup, the only place where I've seen blocking being an issue is when libmpdclient connects. And the part of the connection process where it's an issue is the host address resolution (I checked). I dealt with it by using Qt's [QHostInfo::lookupHost](https://doc.qt.io/qt-5/qhostinfo.html#lookupHost-1) to validate the hostname before connecting MPD.
 
 As for the Qt side? I start with the standard CMake QWidgets boilerplate created by Qt Creator, and I add a button to "list albums" All output from MPD goes into QDebug. The presentation layer is not what I'm demonstrating.

@@ -46,6 +46,11 @@ void MainWindow::recvNotification()
 {
     qDebug() << "RECEIVING NOTIFICATION";
     auto idle = m_mpd->recvIdle(false);
+    handleNotification(idle);
+}
+
+void MainWindow::handleNotification(mpd_idle idle)
+{
     if (idle != 0)
     {
         if (idle & MPD_IDLE_DATABASE)
@@ -116,12 +121,16 @@ void MainWindow::recvNotification()
 
 void MainWindow::listAlbums()
 {
+    m_mpd->setNotifierEnabled(false);
+    handleNotification(m_mpd->runNoIdle());
     m_mpd->searchDBTags(MPD_TAG_ALBUM);
     m_mpd->searchCommit();
     for (auto pair: m_mpd->recvPairTags(MPD_TAG_ALBUM))
     {
         qDebug() << pair.second;
     }
+    m_mpd->setNotifierEnabled(true);
+    m_mpd->sendIdle();
 }
 
 
