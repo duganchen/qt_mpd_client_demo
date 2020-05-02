@@ -37,7 +37,7 @@ Idle notifications are received asynchronously, and commands are sent and receiv
 4. turn the socket notifier back on
 5. send idle
 
-Note that the idle notifications tell you when you've lost the connection. When that happens, you receive a notification with the value of 0, and you get "Connection closed by the server" as an error.
+Note that the idle notifications tell you when you've lost the connection. When that happens, you receive a notification with the value of 0, and you get "Connection closed by the server" as an error. The error code constant is MPD_ERROR_CLOSED.
 
 For reconnections? One option is to make both the MPD connection instance and the socket notifier and instance of a Facade class. When you need a new connection, free it and instantiate a new one.
 
