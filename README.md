@@ -41,6 +41,6 @@ Note that the idle notifications tell you when you've lost the connection. When 
 
 For reconnections? One option is to make both the MPD connection instance and the socket notifier and instance of a Facade class. When you need a new connection, free it and instantiate a new one.
 
-With this setup, the only place where I've seen blocking being an issue is when libmpdclient connects. And the part of the connection process where it's an issue is the host address resolution (I checked). I dealt with it by using Qt's [QHostInfo::lookupHost](https://doc.qt.io/qt-5/qhostinfo.html#lookupHost-1) to validate the hostname before connecting MPD.
+With this setup, the only place where I've seen blocking being an issue is when libmpdclient connects. And the part of the connection process where it's an issue is the host address resolution (I checked). I dealt with it by using Qt's [QHostInfo::lookupHost](https://doc.qt.io/qt-5/qhostinfo.html#lookupHost-1) to validate the hostname before connecting to MPD.
 
 As for the Qt side? I start with the standard CMake QWidgets boilerplate created by Qt Creator, and I add a button to "list albums" All output from MPD goes into QDebug. The presentation layer is not what I'm demonstrating.
