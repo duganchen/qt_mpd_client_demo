@@ -21,7 +21,8 @@ MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWi
             return;
         }
 
-        m_mpd = new MPDConnection(m_host, m_port, m_timeout_ms, this);
+        m_mpd = new MPDConnection(this);
+        m_mpd->connectToMPD();
         if (m_mpd->isNull())
         {
             qDebug() << "Cannot allocate MPD connection.";

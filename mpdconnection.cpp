@@ -1,7 +1,6 @@
 #include "mpdconnection.h"
 
-MPDConnection::MPDConnection(const char *host, unsigned port, unsigned timeout_ms, QObject *parent)
-    : QObject(parent), m_mpd(nullptr), m_notifier(nullptr)
+MPDConnection::MPDConnection(QObject *parent) : m_mpd(nullptr), m_notifier(nullptr)
 {
 }
 
