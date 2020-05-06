@@ -25,8 +25,6 @@ public:
     mpd_idle runNoIdle();
 
     void setNotifierEnabled(bool);
-
-    void connectToMPD();
 signals:
     void activated();
 

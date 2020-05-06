@@ -1,7 +1,23 @@
 #include "mpdconnection.h"
 
-MPDConnection::MPDConnection(QObject *parent) : m_mpd(nullptr), m_notifier(nullptr)
+MPDConnection::MPDConnection(QObject *parent) : QObject(parent), m_mpd(nullptr), m_notifier(nullptr)
 {
+    // Note the typo. This should block for about a second.
+    m_mpd = mpd_connection_new("localhost", 6600, 100);
+
+    if (m_mpd == nullptr)
+    {
+        return;
+    }
+
+    if (MPD_ERROR_SUCCESS != mpd_connection_get_error(m_mpd))
+    {
+        return;
+    }
+
+    m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_mpd), QSocketNotifier::Read, this);
+
+    connect(m_notifier, &QSocketNotifier::activated, [=] { emit activated(); });
 }
 
 bool MPDConnection::isNull()
@@ -73,23 +89,4 @@ MPDConnection::~MPDConnection()
 void MPDConnection::setNotifierEnabled(bool enabled)
 {
     m_notifier->setEnabled(enabled);
-}
-
-void MPDConnection::connectToMPD()
-{
-    m_mpd = mpd_connection_new("locahost", 6600, 0);
-
-    if (m_mpd == nullptr)
-    {
-        return;
-    }
-
-    if (MPD_ERROR_SUCCESS != mpd_connection_get_error(m_mpd))
-    {
-        return;
-    }
-
-    m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_mpd), QSocketNotifier::Read, this);
-
-    connect(m_notifier, &QSocketNotifier::activated, [=] { emit activated(); });
 }

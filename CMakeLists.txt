@@ -20,6 +20,7 @@ add_executable(qt_mpd_test
   main.cpp
   mainwindow.cpp
   mpdconnection.cpp
+  mpdconnector.cpp
 )
 
 target_include_directories(qt_mpd_test PRIVATE ${LIBMPDCLIENT_INCLUDE_DIRS})

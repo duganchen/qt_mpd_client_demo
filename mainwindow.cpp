@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "mpdconnector.h"
 #include <QDebug>
 #include <QPushButton>
 #include <QtNetwork/QHostInfo>
@@ -16,6 +17,14 @@ MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWi
 
     setEnabled(false);
 
+    auto connector = new MPDConnector();
+    connector->moveToThread(&connectionThread);
+    connect(this, &MainWindow::startConnecting, connector, &MPDConnector::createConnection);
+    connect(connector, &MPDConnector::mpdConnection, this, &MainWindow::setConnection);
+    connectionThread.start();
+    emit startConnecting();
+
+#if 0
     m_mpd = new MPDConnection(this);
     m_mpd->connectToMPD();
 
@@ -36,6 +45,15 @@ MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWi
     connect(m_mpd, &MPDConnection::activated, this, &MainWindow::recvNotification);
 
     m_mpd->sendIdle();
+
+    QHostInfo::lookupHost(m_host, this, [=](QHostInfo info) {
+        if (info.error() != QHostInfo::NoError)
+        {
+            qDebug() << info.errorString();
+            return;
+        }
+    });
+#endif
 }
 
 void MainWindow::recvNotification()
@@ -115,6 +133,38 @@ void MainWindow::handleNotification(mpd_idle idle)
     }
 }
 
+void MainWindow::setConnection(MPDConnection *mpdConnection)
+{
+    qDebug() << "Connection received";
+    m_mpd = mpdConnection;
+
+    if (m_mpd->isNull())
+    {
+        qDebug() << "Cannot allocate MPD connection.";
+        return;
+    }
+
+    if (m_mpd->error() != MPD_ERROR_SUCCESS)
+    {
+        qDebug() << m_mpd->errorMessage();
+        return;
+    }
+
+    setEnabled(true);
+
+    connect(m_mpd, &MPDConnection::activated, this, &MainWindow::recvNotification);
+
+    m_mpd->sendIdle();
+
+    QHostInfo::lookupHost(m_host, this, [=](QHostInfo info) {
+        if (info.error() != QHostInfo::NoError)
+        {
+            qDebug() << info.errorString();
+            return;
+        }
+    });
+}
+
 void MainWindow::listAlbums()
 {
     m_mpd->setNotifierEnabled(false);
@@ -131,4 +181,6 @@ void MainWindow::listAlbums()
 
 MainWindow::~MainWindow()
 {
+    connectionThread.wait();
+    connectionThread.quit();
 }
