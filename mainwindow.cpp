@@ -4,6 +4,8 @@
 #include <QtNetwork/QHostInfo>
 #include <mpd/client.h>
 
+#include <QThread>
+
 MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWidget *parent)
     : QMainWindow(parent), m_host(host), m_port(port), m_timeout_ms(timeout_ms), m_mpd(nullptr),
       albumListButton(nullptr)
@@ -14,33 +16,26 @@ MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWi
 
     setEnabled(false);
 
-    QHostInfo::lookupHost(m_host, this, [=](QHostInfo info) {
-        if (info.error() != QHostInfo::NoError)
-        {
-            qDebug() << info.errorString();
-            return;
-        }
+    m_mpd = new MPDConnection(this);
+    m_mpd->connectToMPD();
 
-        m_mpd = new MPDConnection(this);
-        m_mpd->connectToMPD();
-        if (m_mpd->isNull())
-        {
-            qDebug() << "Cannot allocate MPD connection.";
-            return;
-        }
+    if (m_mpd->isNull())
+    {
+        qDebug() << "Cannot allocate MPD connection.";
+        return;
+    }
 
-        if (m_mpd->error() != MPD_ERROR_SUCCESS)
-        {
-            qDebug() << m_mpd->errorMessage();
-            return;
-        }
+    if (m_mpd->error() != MPD_ERROR_SUCCESS)
+    {
+        qDebug() << m_mpd->errorMessage();
+        return;
+    }
 
-        setEnabled(true);
+    setEnabled(true);
 
-        connect(m_mpd, &MPDConnection::activated, this, &MainWindow::recvNotification);
+    connect(m_mpd, &MPDConnection::activated, this, &MainWindow::recvNotification);
 
-        m_mpd->sendIdle();
-    });
+    m_mpd->sendIdle();
 }
 
 void MainWindow::recvNotification()
