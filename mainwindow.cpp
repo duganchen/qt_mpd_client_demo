@@ -1,11 +1,12 @@
-#include <mpd/client.h>
+#include "mainwindow.h"
 #include <QDebug>
 #include <QPushButton>
 #include <QtNetwork/QHostInfo>
-#include "mainwindow.h"
+#include <mpd/client.h>
 
 MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWidget *parent)
-    : QMainWindow(parent), m_host(host), m_port(port), m_timeout_ms(timeout_ms), m_mpd(nullptr), albumListButton(nullptr)
+    : QMainWindow(parent), m_host(host), m_port(port), m_timeout_ms(timeout_ms), m_mpd(nullptr),
+      albumListButton(nullptr)
 {
     albumListButton = new QPushButton("&List Albums", this);
     connect(albumListButton, &QPushButton::clicked, this, &MainWindow::listAlbums);
@@ -13,7 +14,7 @@ MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWi
 
     setEnabled(false);
 
-    QHostInfo::lookupHost(m_host, this, [=](QHostInfo info){
+    QHostInfo::lookupHost(m_host, this, [=](QHostInfo info) {
         if (info.error() != QHostInfo::NoError)
         {
             qDebug() << info.errorString();
@@ -40,7 +41,6 @@ MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWi
         m_mpd->sendIdle();
     });
 }
-
 
 void MainWindow::recvNotification()
 {
@@ -125,7 +125,7 @@ void MainWindow::listAlbums()
     handleNotification(m_mpd->runNoIdle());
     m_mpd->searchDBTags(MPD_TAG_ALBUM);
     m_mpd->searchCommit();
-    for (auto pair: m_mpd->recvPairTags(MPD_TAG_ALBUM))
+    for (auto pair : m_mpd->recvPairTags(MPD_TAG_ALBUM))
     {
         qDebug() << pair.second;
     }
@@ -133,8 +133,6 @@ void MainWindow::listAlbums()
     m_mpd->sendIdle();
 }
 
-
 MainWindow::~MainWindow()
 {
 }
-

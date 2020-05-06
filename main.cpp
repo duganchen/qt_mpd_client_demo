@@ -3,8 +3,8 @@
 #include <mpd/client.h>
 
 #include <QApplication>
-#include <iostream>
 #include <QDebug>
+#include <iostream>
 
 #include <QSocketNotifier>
 

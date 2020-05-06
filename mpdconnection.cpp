@@ -1,31 +1,15 @@
 #include "mpdconnection.h"
 
-MPDConnection::MPDConnection(const char *host, unsigned port, unsigned timeout_ms, QObject *parent): QObject(parent), m_mpd(nullptr), m_notifier(nullptr)
+MPDConnection::MPDConnection(const char *host, unsigned port, unsigned timeout_ms, QObject *parent)
+    : QObject(parent), m_mpd(nullptr), m_notifier(nullptr)
 {
-    m_mpd = mpd_connection_new(host, port, timeout_ms);
-
-    if (m_mpd == nullptr)
-    {
-        return;
-    }
-
-    if (MPD_ERROR_SUCCESS != mpd_connection_get_error(m_mpd))
-    {
-        return;
-    }
-
-    m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_mpd), QSocketNotifier::Read, this);
-
-    connect(m_notifier, &QSocketNotifier::activated, [=]{emit activated();});
 }
-
 
 bool MPDConnection::isNull()
 {
     // Use this check that the constructor didn't fail due to OOM
     return m_mpd == nullptr;
 }
-
 
 mpd_error MPDConnection::error()
 {
@@ -36,7 +20,6 @@ QString MPDConnection::errorMessage()
 {
     return mpd_connection_get_error_message(m_mpd);
 }
-
 
 bool MPDConnection::searchDBTags(enum mpd_tag_type type)
 {
@@ -91,4 +74,23 @@ MPDConnection::~MPDConnection()
 void MPDConnection::setNotifierEnabled(bool enabled)
 {
     m_notifier->setEnabled(enabled);
+}
+
+void MPDConnection::connectToMPD()
+{
+    m_mpd = mpd_connection_new("locahost", 6600, 0);
+
+    if (m_mpd == nullptr)
+    {
+        return;
+    }
+
+    if (MPD_ERROR_SUCCESS != mpd_connection_get_error(m_mpd))
+    {
+        return;
+    }
+
+    m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_mpd), QSocketNotifier::Read, this);
+
+    connect(m_notifier, &QSocketNotifier::activated, [=] { emit activated(); });
 }
