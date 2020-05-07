@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "mpdconnector.h"
+#include <QApplication>
 #include <QDebug>
 #include <QPushButton>
 #include <QtNetwork/QHostInfo>
@@ -136,6 +137,7 @@ void MainWindow::handleNotification(mpd_idle idle)
 void MainWindow::setConnection(MPDConnection *mpdConnection)
 {
     qDebug() << "Connection received";
+
     m_mpd = mpdConnection;
 
     if (m_mpd->isNull())
