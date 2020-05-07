@@ -39,7 +39,7 @@ Idle notifications are received asynchronously, and commands are sent and receiv
 
 Note that the idle notifications tell you when you've lost the connection. When that happens, you receive a notification with the value of 0, and you get "Connection closed by the server" as an error. The error code constant is MPD_ERROR_CLOSED.
 
-Now, Creating the connection is  is done using **mpd_connection_new**, which can block until a programmer-specified timeout is reached, and which returns a pointer to an opaque object. This is actually one of the trickier parts to integrate, as:
+Now, Creating the connection is done using **mpd_connection_new**, which can block until a programmer-specified timeout is reached, and which returns a pointer to an opaque object. This is actually one of the trickier parts to integrate, as:
 
 * it can block for long enough for it to matter
 * the object, being a "pointer to an incomplete type", cannot be passed via Qt's signals and slots
