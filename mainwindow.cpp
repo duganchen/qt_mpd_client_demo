@@ -183,6 +183,6 @@ void MainWindow::listAlbums()
 
 MainWindow::~MainWindow()
 {
-    connectionThread.wait();
     connectionThread.quit();
+    connectionThread.wait();
 }
