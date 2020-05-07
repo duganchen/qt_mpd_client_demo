@@ -1,157 +1,58 @@
 #include "mainwindow.h"
-#include "mpdconnector.h"
-#include <QApplication>
-#include <QDebug>
+#include "connectionstate.h"
 #include <QPushButton>
-#include <QtNetwork/QHostInfo>
-#include <mpd/client.h>
+#include <QStatusBar>
+#include <QVBoxLayout>
 
-#include <QThread>
-
-MainWindow::MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWidget *parent)
-    : QMainWindow(parent), m_host(host), m_port(port), m_timeout_ms(timeout_ms), m_mpd(nullptr),
-      albumListButton(nullptr)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    albumListButton = new QPushButton("&List Albums", this);
-    connect(albumListButton, &QPushButton::clicked, this, &MainWindow::listAlbums);
-    setCentralWidget(albumListButton);
-
-    setEnabled(false);
-
-    auto connector = new MPDConnector();
-    connector->moveToThread(&connectionThread);
-    connect(this, &MainWindow::startConnecting, connector, &MPDConnector::createConnection);
-    connect(connector, &MPDConnector::mpdConnection, this, &MainWindow::setConnection);
-    connectionThread.start();
-    emit startConnecting();
-}
-
-void MainWindow::recvNotification()
-{
-    qDebug() << "RECEIVING NOTIFICATION";
-    auto idle = m_mpd->recvIdle(false);
-    handleNotification(idle);
-}
-
-void MainWindow::handleNotification(mpd_idle idle)
-{
-    if (idle != 0)
-    {
-        if (idle & MPD_IDLE_DATABASE)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_DATABASE);
-        }
-
-        if (idle & MPD_IDLE_STORED_PLAYLIST)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_STORED_PLAYLIST);
-        }
-
-        if (idle & MPD_IDLE_QUEUE)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_QUEUE);
-        }
-
-        if (idle & MPD_IDLE_PLAYER)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_PLAYER);
-        }
-
-        if (idle & MPD_IDLE_MIXER)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_MIXER);
-        }
-
-        if (idle & MPD_IDLE_OUTPUT)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_OUTPUT);
-        }
-
-        if (idle & MPD_IDLE_OPTIONS)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_OPTIONS);
-        }
-
-        if (idle & MPD_IDLE_UPDATE)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_UPDATE);
-        }
-
-        if (idle & MPD_IDLE_STICKER)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_STICKER);
-        }
-
-        if (idle & MPD_IDLE_SUBSCRIPTION)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_SUBSCRIPTION);
-        }
-
-        if (idle & MPD_IDLE_MESSAGE)
-        {
-            qDebug() << mpd_idle_name(MPD_IDLE_MESSAGE);
-        }
-
-        m_mpd->sendIdle();
-    }
-    else if (m_mpd->error() != MPD_ERROR_SUCCESS)
-    {
-        qDebug() << m_mpd->errorMessage();
-        setEnabled(false);
-
-        m_mpd->deleteLater();
-    }
-}
-
-void MainWindow::setConnection(MPDConnection *mpdConnection)
-{
-    qDebug() << "Connection received";
-
-    m_mpd = mpdConnection;
-
-    if (m_mpd->isNull())
-    {
-        qDebug() << "Cannot allocate MPD connection.";
-        return;
-    }
-
-    if (m_mpd->error() != MPD_ERROR_SUCCESS)
-    {
-        qDebug() << m_mpd->errorMessage();
-        return;
-    }
-
-    setEnabled(true);
-
-    connect(m_mpd, &MPDConnection::activated, this, &MainWindow::recvNotification);
-
-    m_mpd->sendIdle();
-
-    QHostInfo::lookupHost(m_host, this, [=](QHostInfo info) {
-        if (info.error() != QHostInfo::NoError)
-        {
-            qDebug() << info.errorString();
-            return;
-        }
+    setWindowTitle(tr("Qt/libmpdclient Demo"));
+    auto widget = new QWidget();
+    auto layout = new QVBoxLayout();
+    m_connectButton = new QPushButton(tr("&Connect"));
+    connect(m_connectButton, &QPushButton::clicked, [=]() {
+        setConnectionState(ConnectionState::Connecting);
+        emit connectClicked();
     });
-}
+    layout->addWidget(m_connectButton);
+    m_listAbumsButton = new QPushButton(tr("&List Albums"));
+    connect(m_listAbumsButton, &QPushButton::clicked, [=]() { emit listAlbumsClicked(); });
+    m_listAbumsButton->setEnabled(false);
+    layout->addWidget(m_listAbumsButton);
 
-void MainWindow::listAlbums()
-{
-    m_mpd->setNotifierEnabled(false);
-    handleNotification(m_mpd->runNoIdle());
-    m_mpd->searchDBTags(MPD_TAG_ALBUM);
-    m_mpd->searchCommit();
-    for (auto pair : m_mpd->recvPairTags(MPD_TAG_ALBUM))
-    {
-        qDebug() << pair.second;
-    }
-    m_mpd->setNotifierEnabled(true);
-    m_mpd->sendIdle();
+    m_busyIndicator = new QProgressBar();
+    m_busyIndicator->setMinimum(0);
+    m_busyIndicator->setMaximum(1);
+    layout->addWidget(m_busyIndicator);
+
+    widget->setLayout(layout);
+
+    setCentralWidget(widget);
 }
 
 MainWindow::~MainWindow()
 {
-    connectionThread.quit();
-    connectionThread.wait();
+}
+
+void MainWindow::setConnectionState(ConnectionState connectionState)
+{
+    switch (connectionState)
+    {
+    case ConnectionState::Disconnected:
+        m_connectButton->setEnabled(true);
+        m_listAbumsButton->setEnabled(false);
+        m_busyIndicator->setMaximum(1);
+        break;
+
+    case ConnectionState::Connecting:
+        m_connectButton->setEnabled(false);
+        m_listAbumsButton->setEnabled(false);
+        m_busyIndicator->setMaximum(0);
+        break;
+    case ConnectionState::Connected:
+        m_connectButton->setEnabled(false);
+        m_listAbumsButton->setEnabled(true);
+        m_busyIndicator->setMaximum(1);
+        break;
+    }
 }

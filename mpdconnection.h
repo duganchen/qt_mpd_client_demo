@@ -1,36 +1,32 @@
 #ifndef MPDCONNECTION_H
 #define MPDCONNECTION_H
 
+#include "abstractmpdconnection.h"
+#include "abstractmpdsettings.h"
 #include <QObject>
 #include <QSocketNotifier>
-#include <QVector>
 #include <mpd/client.h>
 
-class MPDConnection : public QObject
+class MPDConnection : public AbstractMPDConnection
 {
     Q_OBJECT
 public:
-    MPDConnection(QObject *parent = nullptr);
+    explicit MPDConnection(AbstractMPDSettings *, QObject *parent = nullptr);
     ~MPDConnection();
 
-    mpd_error error();
-    QString errorMessage();
-    bool isNull();
-    bool searchDBTags(enum mpd_tag_type);
-    bool searchCommit();
-    QVector<QPair<QString, QString>> recvPairTags(enum mpd_tag_type);
-    bool sendIdle();
-    enum mpd_idle recvIdle(bool);
-    static QString idleName(enum mpd_idle);
-    mpd_idle runNoIdle();
-
-    void setNotifierEnabled(bool);
-signals:
-    void activated();
+    virtual mpd_error error();
+    virtual const char *error_message();
+    virtual bool isNull() const;
+    virtual int fd();
+    virtual bool send_idle();
+    virtual mpd_idle run_noidle();
+    virtual QVector<const char *> search_db_tags(mpd_tag_type);
 
 private:
-    struct mpd_connection *m_mpd;
+    mpd_connection *m_mpd;
     QSocketNotifier *m_notifier;
+private slots:
+    void handleActivation();
 };
 
 #endif // MPDCONNECTION_H

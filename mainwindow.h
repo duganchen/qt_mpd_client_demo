@@ -1,36 +1,29 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "mpdconnection.h"
+#include <QLabel>
 #include <QMainWindow>
+#include <QProgressBar>
 #include <QPushButton>
-#include <QSharedPointer>
-#include <QSocketNotifier>
-#include <QThread>
-#include <mpd/client.h>
+
+#include "connectionstate.h"
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(const char *host, unsigned port, unsigned timeout_ms, QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 public slots:
-    void listAlbums();
-    void recvNotification();
-    void handleNotification(mpd_idle);
-    void setConnection(MPDConnection *);
-
+    void setConnectionState(ConnectionState);
 signals:
-    void startConnecting();
+    void connectClicked();
+    void listAlbumsClicked();
 
 private:
-    const char *m_host;
-    unsigned m_port;
-    unsigned m_timeout_ms;
-    MPDConnection *m_mpd;
-    QPushButton *albumListButton;
-    QThread connectionThread;
+    QPushButton *m_connectButton;
+    QPushButton *m_listAbumsButton;
+    QProgressBar *m_busyIndicator;
 };
 #endif // MAINWINDOW_H

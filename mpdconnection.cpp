@@ -1,29 +1,37 @@
 #include "mpdconnection.h"
+#include <QDebug>
+#include <QSocketNotifier>
+#include <mpd/client.h>
 
-MPDConnection::MPDConnection(QObject *parent) : QObject(parent), m_mpd(nullptr), m_notifier(nullptr)
+MPDConnection::MPDConnection(AbstractMPDSettings *settings, QObject *parent)
+    : AbstractMPDConnection(settings, parent), m_notifier(nullptr)
 {
-    // Note the typo. This should block for about a second.
-    m_mpd = mpd_connection_new("localhost", 6600, 100);
+    // Note: This DOES block long enough to become a problem!
 
-    if (m_mpd == nullptr)
+    qDebug() << "Host is " << settings->host();
+    qDebug() << "Port is " << settings->port();
+    qDebug() << "Timeout is " << settings->timeout_ms();
+
+    m_mpd = mpd_connection_new(settings->host(), settings->port(), settings->timeout_ms());
+
+    qDebug() << "mpd_connection_new is done";
+
+    if (mpd_connection_get_error(m_mpd) == MPD_ERROR_SUCCESS)
     {
-        return;
+        qDebug() << "Creating the socket notifier";
+        m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_mpd), QSocketNotifier::Read, this);
+        connect(m_notifier, &QSocketNotifier::activated, this, &MPDConnection::handleActivation);
+        mpd_send_idle(m_mpd);
     }
-
-    if (MPD_ERROR_SUCCESS != mpd_connection_get_error(m_mpd))
-    {
-        return;
-    }
-
-    m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_mpd), QSocketNotifier::Read, this);
-
-    connect(m_notifier, &QSocketNotifier::activated, [=] { emit activated(); });
 }
 
-bool MPDConnection::isNull()
+MPDConnection::~MPDConnection()
 {
-    // Use this check that the constructor didn't fail due to OOM
-    return m_mpd == nullptr;
+    qDebug() << "Deleting the connection";
+    if (m_mpd)
+    {
+        mpd_connection_free(m_mpd);
+    }
 }
 
 mpd_error MPDConnection::error()
@@ -31,62 +39,68 @@ mpd_error MPDConnection::error()
     return mpd_connection_get_error(m_mpd);
 }
 
-QString MPDConnection::errorMessage()
+const char *MPDConnection::error_message()
 {
     return mpd_connection_get_error_message(m_mpd);
 }
 
-bool MPDConnection::searchDBTags(enum mpd_tag_type type)
+bool MPDConnection::isNull() const
 {
-    return mpd_search_db_tags(m_mpd, type);
+    return nullptr == m_mpd;
 }
 
-bool MPDConnection::searchCommit()
+int MPDConnection::fd()
 {
-    return mpd_search_commit(m_mpd);
+    return mpd_connection_get_fd(m_mpd);
 }
 
-QVector<QPair<QString, QString>> MPDConnection::recvPairTags(enum mpd_tag_type type)
-{
-    QVector<QPair<QString, QString>> pairs;
-    struct mpd_pair *pair = nullptr;
-    while ((pair = mpd_recv_pair_tag(m_mpd, type)) != nullptr)
-    {
-        pairs.push_back(QPair<QString, QString>(pair->name, pair->value));
-        mpd_return_pair(m_mpd, pair);
-    }
-    return pairs;
-}
-
-bool MPDConnection::sendIdle()
+bool MPDConnection::send_idle()
 {
     return mpd_send_idle(m_mpd);
 }
 
-enum mpd_idle MPDConnection::recvIdle(bool disable_timeout)
-{
-    return mpd_recv_idle(m_mpd, disable_timeout);
-}
-
-QString MPDConnection::idleName(enum mpd_idle idle)
-{
-    return mpd_idle_name(idle);
-}
-
-mpd_idle MPDConnection::runNoIdle()
+mpd_idle MPDConnection::run_noidle()
 {
     return mpd_run_noidle(m_mpd);
 }
 
-MPDConnection::~MPDConnection()
+QVector<const char *> MPDConnection::search_db_tags(mpd_tag_type type)
 {
-    if (m_mpd != nullptr)
+    QVector<const char *> tags;
+    if (!m_mpd || !m_notifier)
     {
-        mpd_connection_free(m_mpd);
+        return tags;
     }
+
+    m_notifier->setEnabled(false);
+    emit idle(mpd_run_noidle(m_mpd));
+
+    if (!mpd_search_db_tags(m_mpd, type))
+    {
+        qDebug() << mpd_connection_get_error_message(m_mpd);
+        return tags;
+    }
+
+    if (!mpd_search_commit(m_mpd))
+    {
+        qDebug() << mpd_connection_get_error_message(m_mpd);
+        return tags;
+    }
+
+    struct mpd_pair *pair = nullptr;
+    while ((pair = mpd_recv_pair_tag(m_mpd, type)) != nullptr)
+    {
+        tags.push_back(pair->value);
+        mpd_return_pair(m_mpd, pair);
+    }
+
+    m_notifier->setEnabled(true);
+    mpd_send_idle(m_mpd);
+
+    return tags;
 }
 
-void MPDConnection::setNotifierEnabled(bool enabled)
+void MPDConnection::handleActivation()
 {
-    m_notifier->setEnabled(enabled);
+    emit idle(mpd_recv_idle(m_mpd, false));
 }

@@ -25,14 +25,7 @@ I use [libmpdclient](https://www.musicpd.org/libs/libmpdclient/) instead of tryi
 
 In CMake, I specify the languages as both C (libmpdclient) and C++ (Qt). I tell CMake to use pkgconfig to locate libmpdclient.
 
-Using libmpdclient, I create not two connections (one for "idle" push notifications and one for commands), but one.
-
-Creating the connection is  is done using **mpd_connection_new**, which can block until a programmer-specified timeout is reached, and which returns a pointer to an opaque object. This is actually one of the trickier parts to integrate, as:
-
-* it can block for long enough for it to matter
-* the object, being a "pointer to an incomplete type", cannot be passed via Qt's signals and slots
-
-So I wrap what I need of the libmpdclient API in an [Adapter](https://en.wikipedia.org/wiki/Adapter_pattern). It's a QObject subclass. In another thread, I have a [Factory](https://en.wikipedia.org/wiki/Factory_method_pattern) that creates these MPD connection instances and moves them back to the main thread. Data communications between the main thread and the factory is done with signals and slots. Connecting to MPD is the only part that's multithreaded. The rest is event-based.
+For the code architecture, here's the general approach.
 
 To know when idle notifications have arrived, I hook the  connection's file descriptor (which libmpdclient exposes) up to a [QSocketNotifier](https://doc.qt.io/qt-5/qsocketnotifier.html).
 
@@ -46,4 +39,13 @@ Idle notifications are received asynchronously, and commands are sent and receiv
 
 Note that the idle notifications tell you when you've lost the connection. When that happens, you receive a notification with the value of 0, and you get "Connection closed by the server" as an error. The error code constant is MPD_ERROR_CLOSED.
 
-As for the Qt side? I start with the standard CMake QWidgets boilerplate created by Qt Creator, and I add a button to "list albums" All output from MPD goes into QDebug. The presentation layer is not what I'm demonstrating.
+Now, Creating the connection is  is done using **mpd_connection_new**, which can block until a programmer-specified timeout is reached, and which returns a pointer to an opaque object. This is actually one of the trickier parts to integrate, as:
+
+* it can block for long enough for it to matter
+* the object, being a "pointer to an incomplete type", cannot be passed via Qt's signals and slots
+
+So here's the general architecture.
+
+I have a QObject subclass that encapsulates both an ***mpd_connection*** object and its socket notifier. In another thread, I have a [Factory](https://en.wikipedia.org/wiki/Factory_method_pattern) that creates these MPD connection instances and moves them back to the main thread. Data communications between the main thread and the factory is done with signals and slots. Connecting to MPD is the only part that's multithreaded. The rest is event-based.
+
+When an idle notification comes back, you can tell if you've lost the connection. And then you can request another connection from the factory.

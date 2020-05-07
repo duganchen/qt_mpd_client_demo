@@ -1,23 +1,26 @@
+#include "connectionmanager.h"
+#include "controller.h"
 #include "mainwindow.h"
-
-#include <mpd/client.h>
-
+#include "mockmpdsettings.h"
 #include <QApplication>
-#include <QDebug>
-#include <iostream>
-
-#include <QSocketNotifier>
+#include <QObject>
+#include <QThread>
 
 int main(int argc, char *argv[])
 {
-    // Note: qDebug prints nothing by default in Fedora.
-    // Hence this sanityc checkj.
-    // See: https://stackoverflow.com/q/12799653/240515
-    qDebug() << "Do you see this?";
-
     QApplication a(argc, argv);
+    MainWindow w;
+    MockMPDSettings mpd_settings("localhost", 6600, 200, nullptr, nullptr);
+    Controller controller(&mpd_settings);
+    ConnectionManager connectionManager;
+    QObject::connect(&w, &MainWindow::listAlbumsClicked, &controller, &Controller::handleListAlbumsClick);
+    QObject::connect(&w, &MainWindow::connectClicked, &controller, &Controller::handleConnectClick);
+    QObject::connect(&controller, &Controller::connectionState, &w, &MainWindow::setConnectionState);
+    QObject::connect(&controller, &Controller::requestConnection, &connectionManager,
+                     &ConnectionManager::createConnection);
+    QObject::connect(&connectionManager, &ConnectionManager::mpd, &controller, &Controller::setMPD);
 
-    MainWindow w("localhost", 6600, 0);
+    QObject::connect(&controller, &Controller::unrecoverableError, &a, &QApplication::quit);
 
     w.show();
     return a.exec();
