@@ -16,7 +16,7 @@ find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(LIBMPDCLIENT REQUIRED IMPORTED_TARGET libmpdclient)
 
-add_executable(qt_mpd_client_demo_2
+add_executable(qt_mpd_client_demo
   abstractmpdconnection.cpp
   abstractmpdsettings.cpp
   controller.cpp
@@ -30,5 +30,5 @@ add_executable(qt_mpd_client_demo_2
   connectionmanager.cpp
 )
 
-target_include_directories(qt_mpd_client_demo_2 PRIVATE ${LIBMPDCLIENT_INCLUDE_DIRS})
-target_link_libraries(qt_mpd_client_demo_2 PRIVATE Qt5::Widgets PkgConfig::LIBMPDCLIENT)
+target_include_directories(qt_mpd_client_demo PRIVATE ${LIBMPDCLIENT_INCLUDE_DIRS})
+target_link_libraries(qt_mpd_client_demo PRIVATE Qt5::Widgets PkgConfig::LIBMPDCLIENT)
