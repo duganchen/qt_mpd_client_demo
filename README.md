@@ -49,3 +49,13 @@ So here's the general architecture.
 I have a QObject subclass that encapsulates both an ***mpd_connection*** object and its socket notifier. In another thread, I have a [Factory](https://en.wikipedia.org/wiki/Factory_method_pattern) that creates these MPD connection instances and moves them back to the main thread. Data communications between the main thread and the factory is done with signals and slots. Connecting to MPD is the only part that's multithreaded. The rest is event-based.
 
 When an idle notification comes back, you can tell if you've lost the connection. And then you can request another connection from the factory.
+
+## Credits
+
+Uses blank MP3 files from here:
+
+[anars/blank-audio](https://github.com/anars/blank-audio)
+
+Tags are from the following albums:
+
+* [Touhou Luna Nights - Original Soundtrack](https://store.steampowered.com/app/1142470/Touhou_Luna_Nights__Original_Soundtrack/)
