@@ -5,6 +5,9 @@ project(TestController LANGUAGES CXX)
 
 find_package(Qt5Test REQUIRED)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBMPDCLIENT REQUIRED IMPORTED_TARGET libmpdclient)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -18,6 +21,9 @@ enable_testing()
 add_executable(TestController tst_testcontroller.cpp)
 add_test(NAME TestController COMMAND TestController)
 
-target_link_libraries(TestController PRIVATE Qt5::Test)
+target_link_libraries(TestController PRIVATE Qt5::Test PkgConfig::LIBMPDCLIENT)
 
 file(COPY resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+target_include_directories(TestController PRIVATE ${LIBMPDCLIENT_INCLUDE_DIRS})
+
