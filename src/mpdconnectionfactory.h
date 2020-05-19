@@ -1,7 +1,6 @@
 #ifndef MPDCONNECTIONFACTORY_H
 #define MPDCONNECTIONFACTORY_H
 
-#include "abstractmpdsettings.h"
 #include "mpdconnection.h"
 #include <QObject>
 
@@ -11,7 +10,7 @@ class MPDConnectionFactory : public QObject
 public:
     explicit MPDConnectionFactory(QObject *parent = nullptr);
 public slots:
-    void createConnection(AbstractMPDSettings *);
+    void createConnection(const char *, unsigned, unsigned);
 signals:
     void mpd(MPDConnection *);
 };

@@ -1,6 +1,9 @@
 #include "abstractmpdconnection.h"
 
-AbstractMPDConnection::AbstractMPDConnection(AbstractMPDSettings *settings, QObject *parent) : QObject(parent)
+AbstractMPDConnection::AbstractMPDConnection(const char *host, unsigned port, unsigned timeout_ms, QObject *parent)
+    : QObject(parent)
 {
-    Q_UNUSED(settings)
+    Q_UNUSED(host)
+    Q_UNUSED(port)
+    Q_UNUSED(timeout_ms)
 }

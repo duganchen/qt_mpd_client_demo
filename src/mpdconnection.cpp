@@ -3,16 +3,11 @@
 #include <QSocketNotifier>
 #include <mpd/client.h>
 
-MPDConnection::MPDConnection(AbstractMPDSettings *settings, QObject *parent)
-    : AbstractMPDConnection(settings, parent), m_notifier(nullptr)
+MPDConnection::MPDConnection(const char *host, unsigned port, unsigned timeout_ms, QObject *parent)
+    : AbstractMPDConnection(host, port, timeout_ms, parent), m_notifier(nullptr)
 {
     // Note: This DOES block long enough to become a problem!
-
-    qDebug() << "Host is " << settings->host();
-    qDebug() << "Port is " << settings->port();
-    qDebug() << "Timeout is " << settings->timeout_ms();
-
-    m_mpd = mpd_connection_new(settings->host(), settings->port(), settings->timeout_ms());
+    m_mpd = mpd_connection_new(host, port, timeout_ms);
 
     qDebug() << "mpd_connection_new is done";
 

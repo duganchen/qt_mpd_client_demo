@@ -21,10 +21,9 @@ ConnectionManager::~ConnectionManager()
     connectionThread.wait();
 }
 
-void ConnectionManager::createConnection(AbstractMPDSettings *settings)
+void ConnectionManager::createConnection(const char *host, unsigned port, unsigned timeout_ms)
 {
-    qDebug() << "Requesting connection from factory";
-    emit requestConnectionFromFactory(settings);
+    emit requestConnectionFromFactory(host, port, timeout_ms);
 }
 
 void ConnectionManager::setMPD(AbstractMPDConnection *conn)

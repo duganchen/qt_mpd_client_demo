@@ -1,7 +1,6 @@
 #ifndef ABSTRACTMPDCONNECTION_H
 #define ABSTRACTMPDCONNECTION_H
 
-#include "abstractmpdsettings.h"
 #include <QObject>
 #include <mpd/client.h>
 
@@ -9,7 +8,7 @@ class AbstractMPDConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit AbstractMPDConnection(AbstractMPDSettings *settings, QObject *parent = nullptr);
+    explicit AbstractMPDConnection(const char *, unsigned, unsigned, QObject *parent = nullptr);
 
     virtual mpd_error error() = 0;
     virtual const char *error_message() = 0;

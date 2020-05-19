@@ -1,15 +1,14 @@
 #include "controller.h"
-#include "mockmpdsettings.h"
 #include <QDebug>
 
-Controller::Controller(AbstractMPDSettings *mpd_settings, QObject *parent)
-    : QObject(parent), m_mpd(nullptr), m_mpd_settings(mpd_settings)
+Controller::Controller(const char *host, unsigned port, unsigned timeout_ms, QObject *parent)
+    : QObject(parent), m_mpd(nullptr), m_host(host), m_port(port), m_timeout_ms(timeout_ms)
 {
 }
 
 void Controller::handleConnectClick()
 {
-    emit requestConnection(m_mpd_settings);
+    emit requestConnection(m_host, m_port, m_timeout_ms);
 }
 
 void Controller::handleListAlbumsClick()

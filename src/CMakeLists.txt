@@ -18,15 +18,12 @@ pkg_check_modules(LIBMPDCLIENT REQUIRED IMPORTED_TARGET libmpdclient)
 
 add_executable(qt_mpd_client_demo
   abstractmpdconnection.cpp
-  abstractmpdsettings.cpp
   controller.cpp
   main.cpp
   mainwindow.cpp
   mainwindow.h
   mpdconnection.cpp
   mpdconnectionfactory.cpp
-  mockmpdsettings.cpp
-  mpdsettings.cpp
   connectionmanager.cpp
 )
 

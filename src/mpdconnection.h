@@ -2,7 +2,6 @@
 #define MPDCONNECTION_H
 
 #include "abstractmpdconnection.h"
-#include "abstractmpdsettings.h"
 #include <QObject>
 #include <QSocketNotifier>
 #include <mpd/client.h>
@@ -11,7 +10,7 @@ class MPDConnection : public AbstractMPDConnection
 {
     Q_OBJECT
 public:
-    explicit MPDConnection(AbstractMPDSettings *, QObject *parent = nullptr);
+    explicit MPDConnection(const char *, unsigned, unsigned, QObject *parent = nullptr);
     ~MPDConnection();
 
     virtual mpd_error error();
