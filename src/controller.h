@@ -1,8 +1,8 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "abstractmpdconnection.h"
 #include "connectionstate.h"
+#include "mpdconnection.h"
 #include <QObject>
 
 class Controller : public QObject
@@ -13,7 +13,7 @@ public:
 public slots:
     void handleConnectClick();
     void handleListAlbumsClick();
-    void setMPD(AbstractMPDConnection *);
+    void setMPD(MPDConnection *);
 signals:
     void errorMessage(QString);
     void connectionState(ConnectionState);
@@ -28,7 +28,7 @@ signals:
 private:
     void handleIdle(mpd_idle);
 
-    AbstractMPDConnection *m_mpd;
+    MPDConnection *m_mpd;
     const char *m_host;
     unsigned m_port;
     unsigned m_timeout_ms;

@@ -26,8 +26,7 @@ void ConnectionManager::createConnection(const char *host, unsigned port, unsign
     emit requestConnectionFromFactory(host, port, timeout_ms);
 }
 
-void ConnectionManager::setMPD(AbstractMPDConnection *conn)
+void ConnectionManager::setMPD(MPDConnection *conn)
 {
-    qDebug() << "Connection manager has received an instance";
     emit mpd(conn);
 }

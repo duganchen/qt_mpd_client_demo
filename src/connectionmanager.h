@@ -1,7 +1,6 @@
 #ifndef CONNECTIONMANAGER_H
 #define CONNECTIONMANAGER_H
 
-#include "abstractmpdconnection.h"
 #include "mpdconnectionfactory.h"
 #include <QObject>
 #include <QThread>
@@ -14,9 +13,9 @@ public:
     ~ConnectionManager();
 public slots:
     void createConnection(const char *, unsigned, unsigned);
-    void setMPD(AbstractMPDConnection *);
+    void setMPD(MPDConnection *);
 signals:
-    void mpd(AbstractMPDConnection *);
+    void mpd(MPDConnection *);
     void requestConnectionFromFactory(const char *, unsigned, unsigned);
 
 private:

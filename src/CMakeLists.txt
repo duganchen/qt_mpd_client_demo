@@ -17,7 +17,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBMPDCLIENT REQUIRED IMPORTED_TARGET libmpdclient)
 
 add_executable(qt_mpd_client_demo
-  abstractmpdconnection.cpp
   controller.cpp
   main.cpp
   mainwindow.cpp

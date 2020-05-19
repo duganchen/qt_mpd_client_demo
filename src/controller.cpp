@@ -24,7 +24,7 @@ void Controller::handleListAlbumsClick()
     }
 }
 
-void Controller::setMPD(AbstractMPDConnection *mpd)
+void Controller::setMPD(MPDConnection *mpd)
 {
     if (!mpd || mpd->isNull())
     {
@@ -43,7 +43,7 @@ void Controller::setMPD(AbstractMPDConnection *mpd)
     {
         emit connectionState(ConnectionState::Connected);
 
-        connect(mpd, &AbstractMPDConnection::idle, this, &Controller::handleIdle);
+        connect(mpd, &MPDConnection::idle, this, &Controller::handleIdle);
     }
     else
     {

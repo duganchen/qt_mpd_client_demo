@@ -4,7 +4,7 @@
 #include <mpd/client.h>
 
 MPDConnection::MPDConnection(const char *host, unsigned port, unsigned timeout_ms, QObject *parent)
-    : AbstractMPDConnection(host, port, timeout_ms, parent), m_notifier(nullptr)
+    : QObject(parent), m_notifier(nullptr)
 {
     // Note: This DOES block long enough to become a problem!
     m_mpd = mpd_connection_new(host, port, timeout_ms);
