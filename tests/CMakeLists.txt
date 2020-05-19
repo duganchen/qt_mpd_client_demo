@@ -20,3 +20,4 @@ add_test(NAME TestController COMMAND TestController)
 
 target_link_libraries(TestController PRIVATE Qt5::Test)
 
+file(COPY resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
