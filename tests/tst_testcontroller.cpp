@@ -54,6 +54,10 @@ void TestController::test_spinUpMPD()
 	bind_to_address				"/tmp/TestController-XFQcRT/socket"
     */
 
+	// For now, we don't need to copy the audio files to the temporary directory. The tests
+	// don't modify them. If that changes, see:
+	// https://forum.qt.io/topic/105993/copy-folder-qt-c
+
     QProcess mpd;
     QStringList args;
     args.append(confPath);
