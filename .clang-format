@@ -1,10 +1,10 @@
 # My attempt at a style consistent with Qt Creator's
-# 'Qt' style
+# 'Qt' style. Tested against examples from the editor itself.
 BasedOnStyle: WebKit
 BraceWrapping:
   AfterCaseLabel:  true
   AfterClass:      true
-  AfterControlStatement: true
+  AfterControlStatement: false
   AfterFunction:   true
   AfterNamespace:  true
   SplitEmptyRecord: false
@@ -14,7 +14,11 @@ NamespaceIndentation: None
 PointerAlignment: Right
 SpaceInEmptyBlock: false
 
+# Tested against several of Qt's code examples.
+SortIncludes: false
+BreakInheritanceList: AfterColon
+AlignAfterOpenBracket: Align
+
 # My additions
 Cpp11BracedListStyle: true
 SpaceBeforeCpp11BracedList: false
-ColumnLimit: 120
