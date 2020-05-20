@@ -1,3 +1,5 @@
+# My attempt at a style consistent with Qt Creator's
+# 'Qt' style
 BasedOnStyle: WebKit
 BraceWrapping:
   AfterCaseLabel:  true
@@ -12,5 +14,7 @@ NamespaceIndentation: None
 PointerAlignment: Right
 SpaceInEmptyBlock: false
 
-
-
+# My additions
+Cpp11BracedListStyle: true
+SpaceBeforeCpp11BracedList: false
+ColumnLimit: 120
