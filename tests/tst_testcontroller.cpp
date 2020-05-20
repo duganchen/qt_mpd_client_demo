@@ -25,10 +25,10 @@ TestController::~TestController()
 
 void TestController::test_spinUpMPD()
 {
-    QFile templateFile{"resources/mpd.conf"};
+    QFile templateFile { "resources/mpd.conf" };
     QVERIFY(templateFile.open(QIODevice::ReadOnly | QIODevice::Text));
-    QTextStream in{&templateFile};
-    QString tmplate{in.readAll()};
+    QTextStream in { &templateFile };
+    QString tmplate { in.readAll() };
     tmplate = tmplate.arg(QCoreApplication::applicationDirPath() + "/resources/Music");
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
@@ -38,7 +38,7 @@ void TestController::test_spinUpMPD()
     tmplate = tmplate.arg(tempPath);
 
     auto confPath = tempPath + "/mpd.conf";
-    QFile confFile{confPath};
+    QFile confFile { confPath };
     QVERIFY(confFile.open(QIODevice::WriteOnly | QIODevice::Text));
     QTextStream confStream(&confFile);
     confStream << tmplate;
@@ -46,27 +46,27 @@ void TestController::test_spinUpMPD()
     confFile.close();
 
     /* A sample conf would be:
-     music_directory		"/home/dugan/Documents/qt_mpd_client_demo/tests/build/resources/Music"
-     playlist_directory		"/tmp/TestController-XFQcRT/playlists"
-    db_file			"/tmp/TestController-XFQcRT/database"
-    log_file			"/tmp/TestController-XFQcRT/log"
-    pid_file			"/tmp/TestController-XFQcRT/pid"
+    music_directory		"/home/dugan/Documents/qt_mpd_client_demo/tests/build/resources/Music"
+    playlist_directory		"/tmp/TestController-XFQcRT/playlists"
+	db_file			"/tmp/TestController-XFQcRT/database"
+	log_file			"/tmp/TestController-XFQcRT/log"
+	pid_file			"/tmp/TestController-XFQcRT/pid"
 	bind_to_address				"/tmp/TestController-XFQcRT/socket"
-    */
+	*/
 
-	// For now, we don't need to copy the audio files to the temporary directory. The tests
-	// don't modify them. If that changes, see:
-	// https://forum.qt.io/topic/105993/copy-folder-qt-c
+    // For now, we don't need to copy the audio files to the temporary directory. The tests
+    // don't modify them. If that changes, see:
+    // https://forum.qt.io/topic/105993/copy-folder-qt-c
 
-	QProcess mpd;
-	QStringList args;
+    QProcess mpd;
+    QStringList args;
     args.append(confPath);
     mpd.start("mpd", args);
     mpd.waitForFinished();
 
-	auto socketPath = tempPath + "/socket";
+    auto socketPath = tempPath + "/socket";
 
-	auto conn = mpd_connection_new(tempPath.toUtf8().constData(), 0, 0);
+    auto conn = mpd_connection_new(tempPath.toUtf8().constData(), 0, 0);
 
     if (!mpd_search_db_tags(conn, MPD_TAG_TITLE))
     {
