@@ -58,7 +58,7 @@ void TestController::test_spinUpMPD()
 	// don't modify them. If that changes, see:
 	// https://forum.qt.io/topic/105993/copy-folder-qt-c
 
-    QProcess mpd;
+	QProcess mpd;
     QStringList args;
     args.append(confPath);
     mpd.start("mpd", args);
