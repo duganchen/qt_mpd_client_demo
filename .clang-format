@@ -1,22 +1,11 @@
 BasedOnStyle: WebKit
-AllowShortIfStatementsOnASingleLine: Always
 BraceWrapping:
   AfterCaseLabel:  true
   AfterClass:      true
   AfterControlStatement: true
-  AfterEnum:       true
   AfterFunction:   true
   AfterNamespace:  true
-  AfterObjCDeclaration: true
-  AfterStruct:     true
-  AfterUnion:      true
-  AfterExternBlock: true
-  BeforeCatch:     true
-  BeforeElse:      true
-  SplitEmptyFunction: false
   SplitEmptyRecord: false
-  SplitEmptyNamespace: false
-BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeColon
 BreakBeforeBraces: Custom
 NamespaceIndentation: None
