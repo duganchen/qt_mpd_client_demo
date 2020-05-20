@@ -51,7 +51,7 @@ void TestController::test_spinUpMPD()
     db_file			"/tmp/TestController-XFQcRT/database"
     log_file			"/tmp/TestController-XFQcRT/log"
     pid_file			"/tmp/TestController-XFQcRT/pid"
-    port				"6601"
+	bind_to_address				"/tmp/TestController-XFQcRT/socket"
     */
 
     QProcess mpd;
@@ -60,7 +60,9 @@ void TestController::test_spinUpMPD()
     mpd.start("mpd", args);
     mpd.waitForFinished();
 
-    auto conn = mpd_connection_new("localhost", 6601, 0);
+	auto socketPath = tempPath + "/socket";
+
+	auto conn = mpd_connection_new(tempPath.toUtf8().constData(), 0, 0);
 
     if (!mpd_search_db_tags(conn, MPD_TAG_TITLE))
     {
