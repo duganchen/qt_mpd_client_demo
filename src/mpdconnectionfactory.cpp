@@ -3,9 +3,9 @@
 #include <QApplication>
 #include <QDebug>
 
-MPDConnectionFactory::MPDConnectionFactory(QObject *parent) : QObject(parent)
-{
-}
+MPDConnectionFactory::MPDConnectionFactory(QObject *parent)
+    : QObject(parent)
+{}
 
 void MPDConnectionFactory::createConnection(const char *host, unsigned port, unsigned timeout_ms)
 {

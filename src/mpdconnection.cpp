@@ -1,18 +1,18 @@
 #include "mpdconnection.h"
+#include <mpd/client.h>
 #include <QDebug>
 #include <QSocketNotifier>
-#include <mpd/client.h>
 
 MPDConnection::MPDConnection(const char *host, unsigned port, unsigned timeout_ms, QObject *parent)
-    : QObject(parent), m_notifier(nullptr)
+    : QObject(parent)
+    , m_notifier(nullptr)
 {
     // Note: This DOES block long enough to become a problem!
     m_mpd = mpd_connection_new(host, port, timeout_ms);
 
     qDebug() << "mpd_connection_new is done";
 
-    if (mpd_connection_get_error(m_mpd) == MPD_ERROR_SUCCESS)
-    {
+    if (mpd_connection_get_error(m_mpd) == MPD_ERROR_SUCCESS) {
         qDebug() << "Creating the socket notifier";
         m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_mpd), QSocketNotifier::Read, this);
         connect(m_notifier, &QSocketNotifier::activated, this, &MPDConnection::handleActivation);
@@ -23,8 +23,7 @@ MPDConnection::MPDConnection(const char *host, unsigned port, unsigned timeout_m
 MPDConnection::~MPDConnection()
 {
     qDebug() << "Deleting the connection";
-    if (m_mpd)
-    {
+    if (m_mpd) {
         mpd_connection_free(m_mpd);
     }
 }
@@ -62,29 +61,25 @@ mpd_idle MPDConnection::run_noidle()
 QVector<const char *> MPDConnection::search_db_tags(mpd_tag_type type)
 {
     QVector<const char *> tags;
-    if (!m_mpd || !m_notifier)
-    {
+    if (!m_mpd || !m_notifier) {
         return tags;
     }
 
     m_notifier->setEnabled(false);
     emit idle(mpd_run_noidle(m_mpd));
 
-    if (!mpd_search_db_tags(m_mpd, type))
-    {
+    if (!mpd_search_db_tags(m_mpd, type)) {
         qDebug() << mpd_connection_get_error_message(m_mpd);
         return tags;
     }
 
-    if (!mpd_search_commit(m_mpd))
-    {
+    if (!mpd_search_commit(m_mpd)) {
         qDebug() << mpd_connection_get_error_message(m_mpd);
         return tags;
     }
 
     struct mpd_pair *pair = nullptr;
-    while ((pair = mpd_recv_pair_tag(m_mpd, type)) != nullptr)
-    {
+    while ((pair = mpd_recv_pair_tag(m_mpd, type)) != nullptr) {
         tags.push_back(pair->value);
         mpd_return_pair(m_mpd, pair);
     }

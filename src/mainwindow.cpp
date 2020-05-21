@@ -4,7 +4,8 @@
 #include <QStatusBar>
 #include <QVBoxLayout>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
 {
     setWindowTitle(tr("Qt/libmpdclient Demo"));
     auto widget = new QWidget();
@@ -30,14 +31,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setCentralWidget(widget);
 }
 
-MainWindow::~MainWindow()
-{
-}
+MainWindow::~MainWindow() {}
 
 void MainWindow::setConnectionState(ConnectionState connectionState)
 {
-    switch (connectionState)
-    {
+    switch (connectionState) {
     case ConnectionState::Disconnected:
         m_connectButton->setEnabled(true);
         m_listAbumsButton->setEnabled(false);

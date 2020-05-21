@@ -1,7 +1,7 @@
+#include <mpd/client.h>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QtTest>
-#include <mpd/client.h>
 
 class TestController : public QObject
 {
@@ -64,19 +64,16 @@ void TestController::test_spinUpMPD()
 
     auto conn = mpd_connection_new(tempPath.toUtf8().constData(), 0, 0);
 
-    if (!mpd_search_db_tags(conn, MPD_TAG_TITLE))
-    {
+    if (!mpd_search_db_tags(conn, MPD_TAG_TITLE)) {
         qDebug() << mpd_connection_get_error_message(conn);
     }
 
-    if (!mpd_search_commit(conn))
-    {
+    if (!mpd_search_commit(conn)) {
         qDebug() << mpd_connection_get_error_message(conn);
     }
 
     struct mpd_pair *pair = nullptr;
-    while ((pair = mpd_recv_pair_tag(conn, MPD_TAG_TITLE)) != nullptr)
-    {
+    while ((pair = mpd_recv_pair_tag(conn, MPD_TAG_TITLE)) != nullptr) {
         qDebug() << pair->value;
         mpd_return_pair(conn, pair);
     }
