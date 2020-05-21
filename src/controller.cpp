@@ -1,4 +1,5 @@
 #include "controller.h"
+#include "connectionmanager.h"
 #include <QDebug>
 
 Controller::Controller(const char *host, unsigned port, unsigned timeout_ms, QObject *parent)
@@ -7,7 +8,14 @@ Controller::Controller(const char *host, unsigned port, unsigned timeout_ms, QOb
     , m_host(host)
     , m_port(port)
     , m_timeout_ms(timeout_ms)
-{}
+{
+    auto connectionManager = new ConnectionManager(this);
+    connect(this,
+            &Controller::requestConnection,
+            connectionManager,
+            &ConnectionManager::createConnection);
+    connect(connectionManager, &ConnectionManager::mpd, this, &Controller::setMPD);
+}
 
 void Controller::handleConnectClick()
 {
