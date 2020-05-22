@@ -59,3 +59,5 @@ Uses blank MP3 files from here:
 Tags are from the following albums:
 
 * [Touhou Luna Nights - Original Soundtrack](https://store.steampowered.com/app/1142470/Touhou_Luna_Nights__Original_Soundtrack/)
+
+The .clang-format file is [Qt Creator's](https://raw.githubusercontent.com/qt-creator/qt-creator/master/.clang-format).
