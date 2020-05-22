@@ -1,2 +1,9 @@
-build
-CMakeLists.txt.user
+*.dylib
+moc_*.*
+*.o
+Makefile
+*.moc
+target_wrapper.sh
+*.app
+*.user
+*.stash
