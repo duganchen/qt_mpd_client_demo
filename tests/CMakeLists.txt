@@ -1,8 +1,3 @@
-cmake_minimum_required(VERSION 3.6)
-project(qt_mpd_client_demo LANGUAGES CXX)
-
-enable_testing()
-
 file(COPY test_resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(connectionTest tst_testcontroller.cpp)

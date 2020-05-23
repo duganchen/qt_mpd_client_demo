@@ -1,9 +1,2 @@
-*.dylib
-moc_*.*
-*.o
-Makefile
-*.moc
-target_wrapper.sh
-*.app
 *.user
-*.stash
+build

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(qt_mpd_client_demo LANGUAGES C CXX)
+project(qt_mpd_client_demo LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
@@ -10,21 +10,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt5 COMPONENTS Core Widgets Test REQUIRED)
 find_package(PkgConfig REQUIRED)
-
 pkg_check_modules(LIBMPDCLIENT REQUIRED IMPORTED_TARGET libmpdclient)
 
-add_executable(qt_mpd_client_demo
-  main.cpp
-  mainwindow.cpp
-  mainwindow.h
-)
-
 add_subdirectory(Controller)
-target_link_libraries(qt_mpd_client_demo PRIVATE Controller Qt5::Widgets PkgConfig::LIBMPDCLIENT)
-target_include_directories(qt_mpd_client_demo PRIVATE "${PROJECT_SOURCE_DIR}/Controller" ${LIBMPDCLIENT_INCLUDE_DIRS})
-
-
+add_subdirectory(app)
 enable_testing()
-
 add_subdirectory(tests)
 
