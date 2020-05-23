@@ -22,11 +22,11 @@ TestController::~TestController() {}
 void TestController::test_spinUpMPD()
 {
     qDebug() << "spinning up mpd";
-    QFile templateFile{"resources/mpd.conf"};
+    QFile templateFile{"test_resources/mpd.conf"};
     QVERIFY(templateFile.open(QIODevice::ReadOnly | QIODevice::Text));
     QTextStream in{&templateFile};
     QString tmplate{in.readAll()};
-    tmplate = tmplate.arg(QCoreApplication::applicationDirPath() + "/resources/Music");
+    tmplate = tmplate.arg(QCoreApplication::applicationDirPath() + "/test_resources/Music");
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
     auto tempPath = dir.path();
@@ -45,7 +45,7 @@ void TestController::test_spinUpMPD()
     qDebug() << tmplate.toUtf8().constData();
 
     /* A sample conf would be:
-    music_directory		"/home/dugan/Documents/qt_mpd_client_demo/tests/build/resources/Music"
+    music_directory		"/home/dugan/Documents/qt_mpd_client_demo/tests/build/test_resources/Music"
     playlist_directory		"/tmp/TestController-XFQcRT/playlists"
         db_file			"/tmp/TestController-XFQcRT/database"
         log_file			"/tmp/TestController-XFQcRT/log"
