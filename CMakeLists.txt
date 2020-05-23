@@ -20,8 +20,8 @@ add_executable(qt_mpd_client_demo
 )
 
 add_subdirectory(Controller)
-target_link_libraries(qt_mpd_client_demo PUBLIC Controller PRIVATE Qt5::Widgets PkgConfig::LIBMPDCLIENT)
-target_include_directories(qt_mpd_client_demo PUBLIC "${PROJECT_SOURCE_DIR}/Controller" PRIVATE ${LIBMPDCLIENT_INCLUDE_DIRS})
+target_link_libraries(qt_mpd_client_demo PRIVATE Controller Qt5::Widgets PkgConfig::LIBMPDCLIENT)
+target_include_directories(qt_mpd_client_demo PRIVATE "${PROJECT_SOURCE_DIR}/Controller" ${LIBMPDCLIENT_INCLUDE_DIRS})
 
 
 enable_testing()
