@@ -7,6 +7,8 @@ TEMPLATE = app
 SOURCES += \
 	tst_testcontroller.cpp
 
+INCLUDEPATH += ../Controller
+
 unix:!macx: LIBS += -lmpdclient
 
 macx: INCLUDEPATH += /usr/local/Cellar/libmpdclient/2.18/include

@@ -22,8 +22,16 @@ SOURCES += \
 HEADERS += \
     mainwindow.h
 
+INCLUDEPATH += ../Controller
 
 unix:!macx: LIBS += -lmpdclient
 
 macx: INCLUDEPATH += /usr/local/Cellar/libmpdclient/2.18/include
 macx: LIBS += -lmpdclient.2 -L/usr/local/Cellar/libmpdclient/2.18/lib
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Controller/release/ -lController
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Controller/debug/ -lController
+else:unix: LIBS += -L$$OUT_PWD/../Controller/ -lController
+
+INCLUDEPATH += $$PWD/../Controller
+DEPENDPATH += $$PWD/../Controller

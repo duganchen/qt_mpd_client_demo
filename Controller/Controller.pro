@@ -1,4 +1,4 @@
-QT -= gui
+QT += widgets
 
 TEMPLATE = lib
 DEFINES += CONTROLLER_LIBRARY
@@ -38,7 +38,11 @@ unix {
 
 
 
-unix:!macx: LIBS += -lmpdclient
+# unix:!macx: LIBS += -lmpdclient
 
-macx: INCLUDEPATH += /usr/local/Cellar/libmpdclient/2.18/include
-macx: LIBS += -lmpdclient.2 -L/usr/local/Cellar/libmpdclient/2.18/lib
+
+#macx: INCLUDEPATH += /usr/local/Cellar/libmpdclient/2.18/include
+#macx: LIBS += -lmpdclient.2 -L/usr/local/Cellar/libmpdclient/2.18/lib
+
+unix: CONFIG += link_pkgconfig
+unix: PKGCONFIG += libmpdclient
