@@ -5,7 +5,9 @@
 #include "mpdconnection.h"
 #include <QObject>
 
-class Controller : public QObject
+#include "Controller_global.h"
+
+class CONTROLLER_EXPORT Controller : public QObject
 {
     Q_OBJECT
 public:
