@@ -35,8 +35,6 @@ void TestController::test_cannotConnect()
     QSignalSpy spy(controller, &Controller::connectionState);
     controller->handleConnectClick();
     spy.wait();
-    qDebug() << spy.count();
-    qDebug() << spy[0][0].value<Controller::ConnectionState>();
     auto endState = spy[0][0].value<Controller::ConnectionState>();
     QCOMPARE(endState, Controller::ConnectionState::Disconnected);
     delete controller;
@@ -76,8 +74,6 @@ void TestController::test_spinUpMPD()
     args.append("--no-daemon");
     args.append(confPath);
 
-    mpd.setProcessChannelMode(QProcess::ForwardedChannels);
-
     // On OS X, you may need to go to Projects->Build and add
     // /usr/local/bin to the PATH in the build environment, if that's
     // where mpd is installed.
@@ -92,39 +88,16 @@ void TestController::test_spinUpMPD()
 
     QVERIFY(conn);
     auto success = mpd_connection_get_error(conn);
-    if (success != MPD_ERROR_SUCCESS) {
-        qDebug() << mpd_connection_get_error_message(conn);
-    }
     QVERIFY(MPD_ERROR_SUCCESS == success);
 
     QVERIFY(mpd_run_update(conn, nullptr));
-
-#if 0
-    if (!mpd_search_db_tags(conn, MPD_TAG_TITLE)) {
-        qDebug() << mpd_connection_get_error_message(conn);
-    }
-
-    if (!mpd_search_commit(conn)) {
-        qDebug() << mpd_connection_get_error_message(conn);
-    }
-
-
-    struct mpd_pair *pair = nullptr;
-    while ((pair = mpd_recv_pair_tag(conn, MPD_TAG_TITLE)) != nullptr) {
-        qDebug() << pair->value;
-        mpd_return_pair(conn, pair);
-    }
-#endif
-
     mpd_connection_free(conn);
     conn = nullptr;
 
-    qDebug() << "socketPath is " << socketPath.toUtf8().constData();
     Controller controller(socketPath.toUtf8().constData(), 0, 0);
     QSignalSpy spy(&controller, &Controller::connectionState);
     controller.handleConnectClick();
     spy.wait();
-    qDebug() << spy.count();
     auto endState = spy[0][0].value<Controller::ConnectionState>();
     QCOMPARE(endState, Controller::ConnectionState::Connected);
 
@@ -137,7 +110,6 @@ void TestController::test_spinUpMPD()
     mpd.waitForFinished();
 
     spy.wait();
-    qDebug() << spy.count();
     endState = spy.takeLast()[0].value<Controller::ConnectionState>();
     QCOMPARE(endState, Controller::ConnectionState::Disconnected);
 }

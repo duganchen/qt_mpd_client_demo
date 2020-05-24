@@ -8,10 +8,7 @@ MPDConnection::MPDConnection(QString host, unsigned port, unsigned timeout_ms, Q
     , m_notifier(nullptr)
 {
     // Note: This DOES block long enough to become a problem!
-    qDebug() << "mpd_connection_new(" << host << ", " << port << ", " << timeout_ms << ")";
     m_mpd = mpd_connection_new(host.toUtf8().constData(), port, timeout_ms);
-
-    qDebug() << "mpd_connection_new is done";
 
     if (mpd_connection_get_error(m_mpd) == MPD_ERROR_SUCCESS) {
         qDebug() << "Creating the socket notifier";
