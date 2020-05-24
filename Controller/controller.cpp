@@ -2,7 +2,7 @@
 #include "connectionmanager.h"
 #include <QDebug>
 
-Controller::Controller(const char *host, unsigned port, unsigned timeout_ms, QObject *parent)
+Controller::Controller(QString host, unsigned port, unsigned timeout_ms, QObject *parent)
     : QObject(parent)
     , m_mpd(nullptr)
     , m_host(host)

@@ -27,7 +27,7 @@ ConnectionManager::~ConnectionManager()
     connectionThread.wait();
 }
 
-void ConnectionManager::createConnection(const char *host, unsigned port, unsigned timeout_ms)
+void ConnectionManager::createConnection(QString host, unsigned port, unsigned timeout_ms)
 {
     emit requestConnectionFromFactory(host, port, timeout_ms);
 }

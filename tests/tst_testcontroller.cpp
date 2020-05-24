@@ -122,7 +122,7 @@ void TestController::test_spinUpMPD()
     spy.wait();
     qDebug() << spy.count();
     auto endState = spy[0][0].value<Controller::ConnectionState>();
-    QCOMPARE(endState, Controller::ConnectionState::Disconnected);
+    QCOMPARE(endState, Controller::ConnectionState::Connected);
 
     mpd_connection_free(conn);
 

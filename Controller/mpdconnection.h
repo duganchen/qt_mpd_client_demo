@@ -1,15 +1,15 @@
 #ifndef MPDCONNECTION_H
 #define MPDCONNECTION_H
 
+#include <mpd/client.h>
 #include <QObject>
 #include <QSocketNotifier>
-#include <mpd/client.h>
 
 class MPDConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit MPDConnection(const char *, unsigned, unsigned, QObject *parent = nullptr);
+    explicit MPDConnection(QString, unsigned, unsigned, QObject *parent = nullptr);
     ~MPDConnection();
 
     mpd_error error();

@@ -12,11 +12,11 @@ public:
     explicit ConnectionManager(QObject *parent = nullptr);
     ~ConnectionManager();
 public slots:
-    void createConnection(const char *, unsigned, unsigned);
+    void createConnection(QString, unsigned, unsigned);
     void setMPD(MPDConnection *);
 signals:
     void mpd(MPDConnection *);
-    void requestConnectionFromFactory(const char *, unsigned, unsigned);
+    void requestConnectionFromFactory(QString, unsigned, unsigned);
 
 private:
     QThread connectionThread;

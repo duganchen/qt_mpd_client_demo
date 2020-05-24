@@ -10,7 +10,7 @@ class MPDConnectionFactory : public QObject
 public:
     explicit MPDConnectionFactory(QObject *parent = nullptr);
 public slots:
-    void createConnection(const char *, unsigned, unsigned);
+    void createConnection(QString, unsigned, unsigned);
 signals:
     void mpd(MPDConnection *);
 };
