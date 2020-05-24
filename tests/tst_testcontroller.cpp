@@ -3,6 +3,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QSignalSpy>
+#include <QTest>
 #include <QtTest>
 
 class TestController : public QObject
@@ -43,10 +44,12 @@ void TestController::test_spinUpMPD()
     QString tmplate{in.readAll()};
     tmplate = tmplate.arg(QCoreApplication::applicationDirPath() + "/test_resources/Music");
     QTemporaryDir dir;
+    qDebug() << "Is dir valid?";
     QVERIFY(dir.isValid());
     auto tempPath = dir.path();
 
-    QDir().mkdir(tempPath + "/playlists");
+    QVERIFY(QDir().mkdir(tempPath + "/playlists"));
+    qDebug() << "playlists is valid";
     tmplate = tmplate.arg(tempPath);
 
     auto confPath = tempPath + "/mpd.conf";
@@ -55,9 +58,10 @@ void TestController::test_spinUpMPD()
     QTextStream confStream(&confFile);
     confStream << tmplate;
 
+    qDebug() << tmplate.toUtf8().constData();
     confFile.close();
 
-    qDebug() << tmplate.toUtf8().constData();
+    // qDebug() << tmplate.toUtf8().constData();
 
     /* A sample conf would be:
     music_directory		"/home/dugan/Documents/qt_mpd_client_demo/tests/build/test_resources/Music"
@@ -72,19 +76,40 @@ void TestController::test_spinUpMPD()
     // don't modify them. If that changes, see:
     // https://forum.qt.io/topic/105993/copy-folder-qt-c
 
+    QVERIFY(QFileInfo(tempPath).isDir());
+
     QProcess mpd;
     QStringList args;
+    QVERIFY(QFileInfo(confPath).exists());
+    args.append("-v");
+    args.append("--no-daemon");
     args.append(confPath);
-    mpd.start("mpd", args);
-    mpd.waitForFinished();
+    qDebug() << args;
+    mpd.setProcessChannelMode(QProcess::ForwardedChannels);
+
+    // QTest::qWait(3600000);
+    mpd.start("/usr/local/bin/mpd", args);
+    // mpd.waitForFinished();
+    mpd.waitForStarted();
+    QTest::qWait(5000);
+    qDebug() << mpd.state();
+    qDebug() << mpd.error();
+    qDebug() << "MPD is started";
+    qDebug() << mpd.readAllStandardError().toStdString().c_str();
+    qDebug() << mpd.readAllStandardOutput().toStdString().c_str();
+
+    QCOMPARE(mpd.state(), QProcess::Running);
 
     auto socketPath = tempPath + "/socket";
-
-    qDebug() << tempPath.toUtf8().constData();
 
     auto conn = mpd_connection_new(socketPath.toUtf8().constData(), 0, 0);
 
     QVERIFY(conn);
+    auto success = mpd_connection_get_error(conn);
+    if (success != MPD_ERROR_SUCCESS) {
+        qDebug() << mpd_connection_get_error_message(conn);
+    }
+    QVERIFY(MPD_ERROR_SUCCESS == success);
 
     if (!mpd_search_db_tags(conn, MPD_TAG_TITLE)) {
         qDebug() << mpd_connection_get_error_message(conn);
