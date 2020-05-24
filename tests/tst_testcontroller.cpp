@@ -15,20 +15,28 @@ public:
 
 private slots:
     void test_spinUpMPD();
+    void test_cannotConnect();
 };
 
 TestController::TestController() {}
 
 TestController::~TestController() {}
 
-void TestController::test_spinUpMPD()
+void TestController::test_cannotConnect()
 {
     qRegisterMetaType<Controller::ConnectionState>();
-    Controller controller("localhost", 6600, 0);
-    QSignalSpy spy(&controller, &Controller::connectionState);
-    controller.handleConnectClick();
+    auto controller = new Controller("localhost", 6600, 0);
+    QSignalSpy spy(controller, &Controller::connectionState);
+    controller->handleConnectClick();
+    spy.wait();
     qDebug() << spy.count();
+    qDebug() << spy[0][0].value<Controller::ConnectionState>();
+    auto endState = spy[0][0].value<Controller::ConnectionState>();
+    QCOMPARE(endState, Controller::ConnectionState::Disconnected);
+}
 
+void TestController::test_spinUpMPD()
+{
     qDebug() << "spinning up mpd";
     QFile templateFile{"test_resources/mpd.conf"};
     QVERIFY(templateFile.open(QIODevice::ReadOnly | QIODevice::Text));
