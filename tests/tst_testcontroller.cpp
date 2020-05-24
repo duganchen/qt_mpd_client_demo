@@ -24,7 +24,6 @@ TestController::~TestController() {}
 
 void TestController::test_cannotConnect()
 {
-    qRegisterMetaType<Controller::ConnectionState>();
     auto controller = new Controller("localhost", 6600, 0);
     QSignalSpy spy(controller, &Controller::connectionState);
     controller->handleConnectClick();
