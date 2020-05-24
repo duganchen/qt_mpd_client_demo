@@ -117,7 +117,7 @@ void TestController::test_spinUpMPD()
 #endif
 
     mpd_connection_free(conn);
-    conn == nullptr;
+    conn = nullptr;
 
     qDebug() << "socketPath is " << socketPath.toUtf8().constData();
     Controller controller(socketPath.toUtf8().constData(), 0, 0);
