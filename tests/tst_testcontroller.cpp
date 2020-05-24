@@ -99,6 +99,7 @@ void TestController::test_spinUpMPD()
 
     QVERIFY(mpd_run_update(conn, nullptr));
 
+#if 0
     if (!mpd_search_db_tags(conn, MPD_TAG_TITLE)) {
         qDebug() << mpd_connection_get_error_message(conn);
     }
@@ -107,13 +108,16 @@ void TestController::test_spinUpMPD()
         qDebug() << mpd_connection_get_error_message(conn);
     }
 
+
     struct mpd_pair *pair = nullptr;
     while ((pair = mpd_recv_pair_tag(conn, MPD_TAG_TITLE)) != nullptr) {
         qDebug() << pair->value;
         mpd_return_pair(conn, pair);
     }
+#endif
 
-    QString a{"b"};
+    mpd_connection_free(conn);
+    conn == nullptr;
 
     qDebug() << "socketPath is " << socketPath.toUtf8().constData();
     Controller controller(socketPath.toUtf8().constData(), 0, 0);
@@ -123,8 +127,6 @@ void TestController::test_spinUpMPD()
     qDebug() << spy.count();
     auto endState = spy[0][0].value<Controller::ConnectionState>();
     QCOMPARE(endState, Controller::ConnectionState::Connected);
-
-    mpd_connection_free(conn);
 
     args.clear();
     args.append("--kill");
