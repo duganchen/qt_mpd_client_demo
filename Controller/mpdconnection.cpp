@@ -8,6 +8,7 @@ MPDConnection::MPDConnection(const char *host, unsigned port, unsigned timeout_m
     , m_notifier(nullptr)
 {
     // Note: This DOES block long enough to become a problem!
+    qDebug() << "mpd_connection_new(" << host << ", " << port << ", " << timeout_ms << ")";
     m_mpd = mpd_connection_new(host, port, timeout_ms);
 
     qDebug() << "mpd_connection_new is done";

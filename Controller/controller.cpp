@@ -9,6 +9,8 @@ Controller::Controller(const char *host, unsigned port, unsigned timeout_ms, QOb
     , m_port(port)
     , m_timeout_ms(timeout_ms)
 {
+    qDebug() << "Controller(" << host << ", " << port << ", " << timeout_ms << ")";
+    qDebug() << "m_host is " << m_host;
     qRegisterMetaType<Controller::ConnectionState>();
 
     auto connectionManager = new ConnectionManager(this);
@@ -21,6 +23,7 @@ Controller::Controller(const char *host, unsigned port, unsigned timeout_ms, QOb
 
 void Controller::handleConnectClick()
 {
+    qDebug() << "When attempting to connect, m_host is " << m_host;
     emit requestConnection(m_host, m_port, m_timeout_ms);
 }
 

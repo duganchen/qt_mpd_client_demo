@@ -39,6 +39,7 @@ void TestController::test_cannotConnect()
     qDebug() << spy[0][0].value<Controller::ConnectionState>();
     auto endState = spy[0][0].value<Controller::ConnectionState>();
     QCOMPARE(endState, Controller::ConnectionState::Disconnected);
+    delete controller;
 }
 
 void TestController::test_spinUpMPD()
@@ -96,6 +97,8 @@ void TestController::test_spinUpMPD()
     }
     QVERIFY(MPD_ERROR_SUCCESS == success);
 
+    QVERIFY(mpd_run_update(conn, nullptr));
+
     if (!mpd_search_db_tags(conn, MPD_TAG_TITLE)) {
         qDebug() << mpd_connection_get_error_message(conn);
     }
@@ -112,17 +115,24 @@ void TestController::test_spinUpMPD()
 
     QString a{"b"};
 
+    qDebug() << "socketPath is " << socketPath.toUtf8().constData();
+    Controller controller(socketPath.toUtf8().constData(), 0, 0);
+    QSignalSpy spy(&controller, &Controller::connectionState);
+    controller.handleConnectClick();
+    spy.wait();
+    qDebug() << spy.count();
+    auto endState = spy[0][0].value<Controller::ConnectionState>();
+    QCOMPARE(endState, Controller::ConnectionState::Disconnected);
+
     mpd_connection_free(conn);
 
     args.clear();
     args.append("--kill");
     args.append(confPath);
     QProcess killer;
-    qDebug() << "Killing mpd";
     killer.start("mpd", args);
     killer.waitForFinished();
     mpd.waitForFinished();
-    qDebug() << "MPD is killed";
 }
 
 QTEST_MAIN(TestController)
