@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "controller.h"
 #include <QLabel>
 #include <QMainWindow>
 #include <QProgressBar>
@@ -16,7 +17,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 public slots:
-    void setConnectionState(ConnectionState);
+    void setConnectionState(Controller::ConnectionState);
 signals:
     void connectClicked();
     void listAlbumsClicked();

@@ -1,6 +1,8 @@
+#include "controller.h"
 #include <mpd/client.h>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QSignalSpy>
 #include <QtTest>
 
 class TestController : public QObject
@@ -21,6 +23,12 @@ TestController::~TestController() {}
 
 void TestController::test_spinUpMPD()
 {
+    qRegisterMetaType<Controller::ConnectionState>();
+    Controller controller("localhost", 6600, 0);
+    QSignalSpy spy(&controller, &Controller::connectionState);
+    controller.handleConnectClick();
+    qDebug() << spy.count();
+
     qDebug() << "spinning up mpd";
     QFile templateFile{"test_resources/mpd.conf"};
     QVERIFY(templateFile.open(QIODevice::ReadOnly | QIODevice::Text));
@@ -71,17 +79,13 @@ void TestController::test_spinUpMPD()
 
     QVERIFY(conn);
 
-
     if (!mpd_search_db_tags(conn, MPD_TAG_TITLE)) {
         qDebug() << mpd_connection_get_error_message(conn);
     }
 
-
-
     if (!mpd_search_commit(conn)) {
         qDebug() << mpd_connection_get_error_message(conn);
     }
-
 
     struct mpd_pair *pair = nullptr;
     while ((pair = mpd_recv_pair_tag(conn, MPD_TAG_TITLE)) != nullptr) {
@@ -90,7 +94,6 @@ void TestController::test_spinUpMPD()
     }
 
     QString a{"b"};
-
 
     mpd_connection_free(conn);
 

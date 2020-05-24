@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     auto layout = new QVBoxLayout();
     m_connectButton = new QPushButton(tr("&Connect"));
     connect(m_connectButton, &QPushButton::clicked, [=]() {
-        setConnectionState(ConnectionState::Connecting);
+        setConnectionState(Controller::ConnectionState::Connecting);
         emit connectClicked();
     });
     layout->addWidget(m_connectButton);
@@ -33,21 +33,21 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow() {}
 
-void MainWindow::setConnectionState(ConnectionState connectionState)
+void MainWindow::setConnectionState(Controller::ConnectionState connectionState)
 {
     switch (connectionState) {
-    case ConnectionState::Disconnected:
+    case Controller::ConnectionState::Disconnected:
         m_connectButton->setEnabled(true);
         m_listAbumsButton->setEnabled(false);
         m_busyIndicator->setMaximum(1);
         break;
 
-    case ConnectionState::Connecting:
+    case Controller::ConnectionState::Connecting:
         m_connectButton->setEnabled(false);
         m_listAbumsButton->setEnabled(false);
         m_busyIndicator->setMaximum(0);
         break;
-    case ConnectionState::Connected:
+    case Controller::ConnectionState::Connected:
         m_connectButton->setEnabled(false);
         m_listAbumsButton->setEnabled(true);
         m_busyIndicator->setMaximum(1);
