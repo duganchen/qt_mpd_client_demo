@@ -2,9 +2,15 @@
 #include <mpd/client.h>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QProcess>
 #include <QSignalSpy>
 #include <QTest>
 #include <QtTest>
+
+// There's a delay between the time that you start MPD and when it
+// starts accepting connections.This wait-time works reliably on my
+// 2015 MacBook Pro.
+constexpr int MPD_START_MS{500};
 
 class TestController : public QObject
 {
@@ -37,19 +43,16 @@ void TestController::test_cannotConnect()
 
 void TestController::test_spinUpMPD()
 {
-    qDebug() << "spinning up mpd";
     QFile templateFile{"test_resources/mpd.conf"};
     QVERIFY(templateFile.open(QIODevice::ReadOnly | QIODevice::Text));
     QTextStream in{&templateFile};
     QString tmplate{in.readAll()};
     tmplate = tmplate.arg(QCoreApplication::applicationDirPath() + "/test_resources/Music");
     QTemporaryDir dir;
-    qDebug() << "Is dir valid?";
     QVERIFY(dir.isValid());
     auto tempPath = dir.path();
 
     QVERIFY(QDir().mkdir(tempPath + "/playlists"));
-    qDebug() << "playlists is valid";
     tmplate = tmplate.arg(tempPath);
 
     auto confPath = tempPath + "/mpd.conf";
@@ -57,20 +60,7 @@ void TestController::test_spinUpMPD()
     QVERIFY(confFile.open(QIODevice::WriteOnly | QIODevice::Text));
     QTextStream confStream(&confFile);
     confStream << tmplate;
-
-    qDebug() << tmplate.toUtf8().constData();
     confFile.close();
-
-    // qDebug() << tmplate.toUtf8().constData();
-
-    /* A sample conf would be:
-    music_directory		"/home/dugan/Documents/qt_mpd_client_demo/tests/build/test_resources/Music"
-    playlist_directory		"/tmp/TestController-XFQcRT/playlists"
-        db_file			"/tmp/TestController-XFQcRT/database"
-        log_file			"/tmp/TestController-XFQcRT/log"
-        pid_file			"/tmp/TestController-XFQcRT/pid"
-        bind_to_address				"/tmp/TestController-XFQcRT/socket"
-        */
 
     // For now, we don't need to copy the audio files to the temporary directory. The tests
     // don't modify them. If that changes, see:
@@ -84,19 +74,14 @@ void TestController::test_spinUpMPD()
     args.append("-v");
     args.append("--no-daemon");
     args.append(confPath);
-    qDebug() << args;
+
     mpd.setProcessChannelMode(QProcess::ForwardedChannels);
 
-    // QTest::qWait(3600000);
-    mpd.start("/usr/local/bin/mpd", args);
-    // mpd.waitForFinished();
-    mpd.waitForStarted();
-    QTest::qWait(5000);
-    qDebug() << mpd.state();
-    qDebug() << mpd.error();
-    qDebug() << "MPD is started";
-    qDebug() << mpd.readAllStandardError().toStdString().c_str();
-    qDebug() << mpd.readAllStandardOutput().toStdString().c_str();
+    // On OS X, you may need to go to Projects->Build and add
+    // /usr/local/bin to the PATH in the build environment, if that's
+    // where mpd is installed.
+    mpd.start("mpd", args);
+    QTest::qWait(MPD_START_MS);
 
     QCOMPARE(mpd.state(), QProcess::Running);
 
@@ -132,8 +117,12 @@ void TestController::test_spinUpMPD()
     args.clear();
     args.append("--kill");
     args.append(confPath);
-    mpd.start("mpd", args);
+    QProcess killer;
+    qDebug() << "Killing mpd";
+    killer.start("mpd", args);
+    killer.waitForFinished();
     mpd.waitForFinished();
+    qDebug() << "MPD is killed";
 }
 
 QTEST_MAIN(TestController)
