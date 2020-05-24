@@ -135,6 +135,11 @@ void TestController::test_spinUpMPD()
     killer.start("mpd", args);
     killer.waitForFinished();
     mpd.waitForFinished();
+
+    spy.wait();
+    qDebug() << spy.count();
+    endState = spy.takeLast()[0].value<Controller::ConnectionState>();
+    QCOMPARE(endState, Controller::ConnectionState::Disconnected);
 }
 
 QTEST_MAIN(TestController)
