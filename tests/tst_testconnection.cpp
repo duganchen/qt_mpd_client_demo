@@ -12,24 +12,24 @@
 // 2015 MacBook Pro.
 constexpr int MPD_START_MS{500};
 
-class TestController : public QObject
+class TestConnection : public QObject
 {
     Q_OBJECT
 
 public:
-    TestController();
-    ~TestController();
+    TestConnection();
+    ~TestConnection();
 
 private slots:
     void test_spinUpMPD();
     void test_cannotConnect();
 };
 
-TestController::TestController() {}
+TestConnection::TestConnection() {}
 
-TestController::~TestController() {}
+TestConnection::~TestConnection() {}
 
-void TestController::test_cannotConnect()
+void TestConnection::test_cannotConnect()
 {
     auto controller = new Controller("localhost", 6600, 0);
     QSignalSpy spy(controller, &Controller::connectionState);
@@ -40,13 +40,13 @@ void TestController::test_cannotConnect()
     delete controller;
 }
 
-void TestController::test_spinUpMPD()
+void TestConnection::test_spinUpMPD()
 {
-    QFile templateFile{"test_resources/mpd.conf"};
+    QFile templateFile{"resources/mpd.conf"};
     QVERIFY(templateFile.open(QIODevice::ReadOnly | QIODevice::Text));
     QTextStream in{&templateFile};
     QString tmplate{in.readAll()};
-    tmplate = tmplate.arg(QCoreApplication::applicationDirPath() + "/test_resources/Music");
+    tmplate = tmplate.arg(QCoreApplication::applicationDirPath() + "/resources/Music");
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
     auto tempPath = dir.path();
@@ -114,6 +114,6 @@ void TestController::test_spinUpMPD()
     QCOMPARE(endState, Controller::ConnectionState::Disconnected);
 }
 
-QTEST_MAIN(TestController)
+QTEST_MAIN(TestConnection)
 
-#include "tst_testcontroller.moc"
+#include "tst_testconnection.moc"
