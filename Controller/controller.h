@@ -18,6 +18,9 @@ public:
 public slots:
     void handleConnectClick();
     void handleListAlbumsClick();
+
+public:
+    QVector<QString> getAlbumList();
 signals:
     void errorMessage(QString);
     void connectionState(Controller::ConnectionState connectionState);

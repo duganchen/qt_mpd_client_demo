@@ -30,9 +30,20 @@ void Controller::handleListAlbumsClick()
         return;
     }
 
-    for (const char *tag : m_mpd->search_db_tags(MPD_TAG_ALBUM)) {
-        qDebug() << tag;
+    for (auto album : getAlbumList()) {
+        qDebug() << album;
     }
+}
+
+QVector<QString> Controller::getAlbumList()
+{
+    QVector<QString> albums;
+
+    for (const char *tag : m_mpd->search_db_tags(MPD_TAG_ALBUM)) {
+        albums.push_back(tag);
+    }
+
+    return albums;
 }
 
 void Controller::setMPD(MPDConnection *mpd)
