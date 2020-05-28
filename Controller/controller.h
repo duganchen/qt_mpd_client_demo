@@ -18,7 +18,6 @@ public:
 public slots:
     void handleConnectClick();
     void handleListAlbumsClick();
-    void setMPD(MPDConnection *);
 signals:
     void errorMessage(QString);
     void connectionState(Controller::ConnectionState connectionState);
@@ -37,6 +36,8 @@ private:
     QString m_host;
     unsigned m_port;
     unsigned m_timeout_ms;
+private slots:
+    void setMPD(MPDConnection *);
 };
 
 Q_DECLARE_METATYPE(Controller::ConnectionState);
