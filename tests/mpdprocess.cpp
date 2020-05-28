@@ -44,7 +44,7 @@ MPDProcess::MPDProcess(QObject *parent)
     auto conn = mpd_connection_new(m_socketPath.toUtf8().constData(), 0, 0);
     QVERIFY(conn);
     m_mpdError = mpd_connection_get_error(conn);
-    if (m_mpdError) {
+    if (MPD_ERROR_SUCCESS == m_mpdError) {
         mpd_run_update(conn, nullptr);
         mpd_connection_free(conn);
         conn = nullptr;
