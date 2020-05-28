@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    Controller controller("localhost", 6600, 200);
+    Controller controller("localhost", 6600, 1000);
     QObject::connect(&w,
                      &MainWindow::listAlbumsClicked,
                      &controller,
