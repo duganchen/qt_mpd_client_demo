@@ -1,6 +1,7 @@
 #ifndef MPDPROCESS_H
 #define MPDPROCESS_H
 
+#include <mpd/client.h>
 #include <QObject>
 #include <QProcess>
 #include <QTemporaryDir>
@@ -19,9 +20,13 @@ public:
 
     QString socketPath();
 
+    mpd_error mpdError();
+
 private:
     QTemporaryDir m_temp;
     QProcess *m_mpdProc;
+    mpd_error m_mpdError;
+    QString m_socketPath;
 };
 
 #endif // MPDPROCESS_H

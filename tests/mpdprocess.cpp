@@ -1,6 +1,8 @@
 #include "mpdprocess.h"
+#include <mpd/client.h>
 #include <QCoreApplication>
 #include <QFile>
+#include <QTest>
 #include <QTextStream>
 
 MPDProcess::MPDProcess(QObject *parent)
@@ -35,6 +37,18 @@ MPDProcess::MPDProcess(QObject *parent)
     // /usr/local/bin to the PATH in the build environment, if that's
     // where mpd is installed.
     m_mpdProc->start("mpd", args);
+
+    QTest::qWait(MPD_START_MS);
+
+    m_socketPath = m_temp.path() + "/socket";
+    auto conn = mpd_connection_new(m_socketPath.toUtf8().constData(), 0, 0);
+    QVERIFY(conn);
+    m_mpdError = mpd_connection_get_error(conn);
+    if (m_mpdError) {
+        mpd_run_update(conn, nullptr);
+        mpd_connection_free(conn);
+        conn = nullptr;
+    }
 }
 
 MPDProcess::~MPDProcess()
@@ -47,7 +61,12 @@ MPDProcess::~MPDProcess()
     m_mpdProc->waitForFinished();
 }
 
+mpd_error MPDProcess::mpdError()
+{
+    return m_mpdError;
+}
+
 QString MPDProcess::socketPath()
 {
-    return m_temp.path() + "/socket";
+    return m_socketPath;
 }
