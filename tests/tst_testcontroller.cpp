@@ -1,4 +1,5 @@
 #include "controller.h"
+#include "mpdprocess.h"
 #include <mpd/client.h>
 #include <QCoreApplication>
 #include <QDebug>
@@ -6,11 +7,6 @@
 #include <QSignalSpy>
 #include <QTest>
 #include <QtTest>
-
-// There's a delay between the time that you start MPD and when it
-// starts accepting connections.This wait-time works reliably on my
-// 2015 MacBook Pro.
-constexpr int MPD_START_MS{500};
 
 class TestController : public QObject
 {
@@ -21,14 +17,41 @@ public:
     ~TestController();
 
 private slots:
+    void init();
+    void cleanup();
+
     void test_theTest();
+    void test_theTest2();
+
+private:
+    MPDProcess *m_mpdProcess;
 };
 
-TestController::TestController() {}
+TestController::TestController()
+    : m_mpdProcess(nullptr)
+{}
 
 TestController::~TestController() {}
 
+void TestController::init()
+{
+    qDebug() << "Init";
+    m_mpdProcess = new MPDProcess(this);
+}
+
+void TestController::cleanup()
+{
+    qDebug() << "Cleanup";
+    delete m_mpdProcess;
+    m_mpdProcess = nullptr;
+}
+
 void TestController::test_theTest()
+{
+    QVERIFY(true);
+}
+
+void TestController::test_theTest2()
 {
     QVERIFY(true);
 }
