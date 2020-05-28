@@ -66,6 +66,11 @@ mpd_error MPDProcess::mpdError()
     return m_mpdError;
 }
 
+QProcess::ProcessState MPDProcess::mpdState()
+{
+    return m_mpdProc->state();
+}
+
 QString MPDProcess::socketPath()
 {
     return m_socketPath;

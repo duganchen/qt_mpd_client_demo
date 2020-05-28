@@ -40,22 +40,27 @@ void TestConnection::test_spinUpMPD()
 {
     auto proc = new MPDProcess();
 
-    QCOMPARE(proc->mpdError(), MPD_ERROR_SUCCESS);
-
-    if (proc->mpdError() == MPD_ERROR_SUCCESS) {
-        Controller controller(proc->socketPath().toUtf8().constData(), 0, 0);
-        QSignalSpy spy(&controller, &Controller::connectionState);
-        controller.handleConnectClick();
-        spy.wait();
-        auto endState = spy[0][0].value<Controller::ConnectionState>();
-        QCOMPARE(endState, Controller::ConnectionState::Connected);
-
-        delete proc;
-
-        spy.wait();
-        endState = spy.takeLast()[0].value<Controller::ConnectionState>();
-        QCOMPARE(endState, Controller::ConnectionState::Disconnected);
+    QCOMPARE(proc->mpdState(), QProcess::Running);
+    if (proc->mpdState() != QProcess::Running) {
+        return;
     }
+
+    QCOMPARE(proc->mpdError(), MPD_ERROR_SUCCESS);
+    if (proc->mpdError() != MPD_ERROR_SUCCESS) {
+        return;
+    }
+
+    Controller controller(proc->socketPath().toUtf8().constData(), 0, 0);
+    QSignalSpy spy(&controller, &Controller::connectionState);
+    controller.handleConnectClick();
+    spy.wait();
+    auto endState = spy[0][0].value<Controller::ConnectionState>();
+    QCOMPARE(endState, Controller::ConnectionState::Connected);
+
+    delete proc;
+
+    spy.wait();
+    endState = spy.takeLast()[0].value<Controller::ConnectionState>();
 }
 
 QTEST_MAIN(TestConnection)

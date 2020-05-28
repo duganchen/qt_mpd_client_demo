@@ -22,6 +22,8 @@ public:
 
     mpd_error mpdError();
 
+    QProcess::ProcessState mpdState();
+
 private:
     QTemporaryDir m_temp;
     QProcess *m_mpdProc;
