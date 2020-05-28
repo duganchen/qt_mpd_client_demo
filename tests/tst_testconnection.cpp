@@ -1,4 +1,5 @@
 #include "controller.h"
+#include "mpdprocess.h"
 #include <mpd/client.h>
 #include <QCoreApplication>
 #include <QDebug>
@@ -42,6 +43,8 @@ void TestConnection::test_cannotConnect()
 
 void TestConnection::test_spinUpMPD()
 {
+    MPDProcess proc;
+#if 0
     QFile templateFile{"resources/mpd.conf"};
     QVERIFY(templateFile.open(QIODevice::ReadOnly | QIODevice::Text));
     QTextStream in{&templateFile};
@@ -112,6 +115,7 @@ void TestConnection::test_spinUpMPD()
     spy.wait();
     endState = spy.takeLast()[0].value<Controller::ConnectionState>();
     QCOMPARE(endState, Controller::ConnectionState::Disconnected);
+#endif
 }
 
 QTEST_MAIN(TestConnection)

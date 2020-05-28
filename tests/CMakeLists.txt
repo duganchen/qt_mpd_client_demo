@@ -1,6 +1,6 @@
 file(COPY resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(connectionTest tst_testconnection.cpp)
+add_executable(connectionTest tst_testconnection.cpp mpdprocess.cpp)
 add_test(NAME connectionTest COMMAND connectionTest)
 
 target_include_directories(connectionTest PRIVATE Qt5::Test "${PROJECT_SOURCE_DIR}/Controller" ${LIBMPDCLIENT_INCLUDE_DIRS})
