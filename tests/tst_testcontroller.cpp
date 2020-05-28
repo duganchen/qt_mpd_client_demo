@@ -48,7 +48,12 @@ void TestController::cleanup()
 
 void TestController::test_theTest()
 {
-    QVERIFY(true);
+    Controller controller(m_mpdProcess->socketPath().toUtf8().constData(), 0, 1000);
+    QSignalSpy spy(&controller, &Controller::connectionState);
+    controller.handleConnectClick();
+    spy.wait();
+    auto albums = controller.getAlbumList();
+    QCOMPARE(albums[0], "Touhou Luna Nights - Original Soundtrack");
 }
 
 void TestController::test_theTest2()
