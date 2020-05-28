@@ -29,7 +29,7 @@ MPDProcess::MPDProcess(QObject *parent)
 
     QStringList args{"-v", "--no-daemon", confPath};
 
-    m_mpdProc = new QProcess(this);
+    m_mpdProc = new QProcess();
 
     // On OS X, you may need to go to Projects->Build and add
     // /usr/local/bin to the PATH in the build environment, if that's
@@ -44,4 +44,10 @@ MPDProcess::~MPDProcess()
     QProcess killer;
     killer.start("mpd", args);
     killer.waitForFinished();
+    m_mpdProc->waitForFinished();
+}
+
+QString MPDProcess::socketPath()
+{
+    return m_temp.path() + "/socket";
 }
