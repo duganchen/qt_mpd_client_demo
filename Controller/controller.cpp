@@ -4,7 +4,6 @@
 
 Controller::Controller(QString host, unsigned port, unsigned timeout_ms, QObject *parent)
     : QObject(parent)
-    , m_mpd(nullptr)
     , m_host(host)
     , m_port(port)
     , m_timeout_ms(timeout_ms)
@@ -77,7 +76,10 @@ QString Controller::host()
 
 void Controller::setMPD(MPDConnection *mpd)
 {
-    if (!mpd->connection()) {
+    mpd_connection *connection = mpd->connection();
+    delete mpd;
+
+    if (!connection) {
         // OOM
         emit unrecoverableError();
     }
@@ -86,9 +88,7 @@ void Controller::setMPD(MPDConnection *mpd)
         mpd_connection_free(m_connection);
     }
 
-    m_mpd = mpd;
-
-    m_connection = mpd->connection();
+    m_connection = connection;
 
     if (mpd_connection_get_error(m_connection) == MPD_ERROR_SUCCESS) {
         qDebug() << "Creating the socket notifier";

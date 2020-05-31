@@ -39,7 +39,6 @@ signals:
 private:
     void handleIdle(mpd_idle);
 
-    MPDConnection *m_mpd;
     QString m_host;
     unsigned m_port;
     unsigned m_timeout_ms;
