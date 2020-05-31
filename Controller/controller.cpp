@@ -41,9 +41,31 @@ QVector<QString> Controller::getAlbumList()
 {
     QVector<QString> albums;
 
-    for (const char *tag : m_mpd->search_db_tags(MPD_TAG_ALBUM)) {
-        albums.push_back(tag);
+    if (!m_connection) {
+        return albums;
     }
+
+    m_notifier->setEnabled(false);
+    mpd_run_noidle(m_connection);
+
+    if (!mpd_search_db_tags(m_connection, MPD_TAG_ALBUM)) {
+        qDebug() << mpd_connection_get_error_message(m_connection);
+        return albums;
+    }
+
+    if (!mpd_search_commit(m_connection)) {
+        qDebug() << mpd_connection_get_error_message(m_connection);
+        return albums;
+    }
+
+    struct mpd_pair *pair = nullptr;
+    while ((pair = mpd_recv_pair_tag(m_connection, MPD_TAG_ALBUM)) != nullptr) {
+        albums.push_back(pair->value);
+        mpd_return_pair(m_connection, pair);
+    }
+
+    m_notifier->setEnabled(true);
+    mpd_send_idle(m_connection);
 
     return albums;
 }
