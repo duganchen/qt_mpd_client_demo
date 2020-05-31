@@ -104,15 +104,15 @@ void Controller::setMPD(MPDConnection *mpd)
 void Controller::handleIdle(mpd_idle idle)
 {
     qDebug() << "Controller has received an idle";
-    if (!m_mpd || m_mpd->isNull()) {
+    if (!m_connection) {
         return;
     }
 
-    if (!idle && m_mpd->error() != MPD_ERROR_SUCCESS) {
+    if (!idle && mpd_connection_get_error(m_connection) != MPD_ERROR_SUCCESS) {
         // This means we lost the connection.
-        qDebug() << m_mpd->error_message();
-        delete m_mpd;
-        m_mpd = nullptr;
+        qDebug() << mpd_connection_get_error_message(m_connection);
+        mpd_connection_free(m_connection);
+        m_connection = nullptr;
         emit connectionState(ConnectionState::Disconnected);
     }
 
