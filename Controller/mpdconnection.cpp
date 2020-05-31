@@ -93,6 +93,11 @@ mpd_connection *MPDConnection::connection()
     return m_mpd;
 }
 
+QSocketNotifier *MPDConnection::notifier()
+{
+    return m_notifier;
+}
+
 void MPDConnection::handleActivation()
 {
     emit idle(mpd_recv_idle(m_mpd, false));

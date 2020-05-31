@@ -9,6 +9,7 @@ Controller::Controller(QString host, unsigned port, unsigned timeout_ms, QObject
     , m_port(port)
     , m_timeout_ms(timeout_ms)
     , m_connection(nullptr)
+    , m_notifier(nullptr)
 {
     qRegisterMetaType<Controller::ConnectionState>();
 
@@ -55,6 +56,7 @@ QString Controller::host()
 void Controller::setMPD(MPDConnection *mpd)
 {
     m_connection = mpd->connection();
+    m_notifier = mpd->notifier();
 
     if (!mpd || mpd->isNull()) {
         // The first condition should never happens. The second means we're out of memory.

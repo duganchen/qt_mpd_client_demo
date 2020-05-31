@@ -45,6 +45,7 @@ private:
     unsigned m_timeout_ms;
 
     mpd_connection *m_connection;
+    QSocketNotifier *m_notifier;
 private slots:
     void setMPD(MPDConnection *);
 };
