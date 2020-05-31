@@ -9,13 +9,14 @@ MPDConnection::MPDConnection(QString host, unsigned port, unsigned timeout_ms, Q
 {
     // Note: This DOES block long enough to become a problem!
     m_mpd = mpd_connection_new(host.toUtf8().constData(), port, timeout_ms);
-
+#if 0
     if (mpd_connection_get_error(m_mpd) == MPD_ERROR_SUCCESS) {
         qDebug() << "Creating the socket notifier";
         m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_mpd), QSocketNotifier::Read, this);
         connect(m_notifier, &QSocketNotifier::activated, this, &MPDConnection::handleActivation);
         mpd_send_idle(m_mpd);
     }
+#endif
 }
 
 MPDConnection::~MPDConnection()

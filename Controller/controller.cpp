@@ -89,7 +89,19 @@ void Controller::setMPD(MPDConnection *mpd)
     m_mpd = mpd;
 
     m_connection = mpd->connection();
+
+#if 0
     m_notifier = mpd->notifier();
+#endif
+
+    if (mpd_connection_get_error(m_connection) == MPD_ERROR_SUCCESS) {
+        qDebug() << "Creating the socket notifier";
+        m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_connection),
+                                         QSocketNotifier::Read,
+                                         this);
+        connect(m_notifier, &QSocketNotifier::activated, this, &Controller::handleActivation);
+        mpd_send_idle(m_connection);
+    }
 
     if (mpd_connection_get_error(m_connection) == MPD_ERROR_SUCCESS) {
         emit connectionState(ConnectionState::Connected);
@@ -120,4 +132,9 @@ void Controller::handleIdle(mpd_idle idle)
         qDebug() << "THE QUEUE HAS CHANGED";
         emit queueChanged();
     }
+}
+
+void Controller::handleActivation()
+{
+    handleIdle(mpd_recv_idle(m_connection, false));
 }

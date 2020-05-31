@@ -48,6 +48,8 @@ private:
     QSocketNotifier *m_notifier;
 private slots:
     void setMPD(MPDConnection *);
+
+    void handleActivation();
 };
 
 Q_DECLARE_METATYPE(Controller::ConnectionState);
