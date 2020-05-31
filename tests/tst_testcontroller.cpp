@@ -21,7 +21,6 @@ private slots:
     void cleanup();
 
     void test_theTest();
-    void test_theTest2();
 
 private:
     MPDProcess *m_mpdProcess;
@@ -64,11 +63,6 @@ void TestController::test_theTest()
     spy.wait();
     auto albums = controller.getAlbumList();
     QCOMPARE(albums[0], "Touhou Luna Nights - Original Soundtrack");
-}
-
-void TestController::test_theTest2()
-{
-    QVERIFY(true);
 }
 
 QTEST_MAIN(TestController)

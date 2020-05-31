@@ -33,9 +33,13 @@ MPDProcess::MPDProcess(QObject *parent)
 
     m_mpdProc = new QProcess();
 
+    m_mpdProc->setProcessChannelMode(QProcess::ForwardedChannels);
+
     // On OS X, you may need to go to Projects->Build and add
     // /usr/local/bin to the PATH in the build environment, if that's
     // where mpd is installed.
+
+    qDebug() << "Starting MPD";
     m_mpdProc->start("mpd", args);
 
     QTest::qWait(MPD_START_MS);
