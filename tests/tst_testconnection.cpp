@@ -27,7 +27,9 @@ TestConnection::~TestConnection() {}
 
 void TestConnection::test_cannotConnect()
 {
-    auto controller = new Controller("localhost", 6600, 0);
+    // Note deliberate typo.
+    auto controller = new Controller("locahost", 6600, 0);
+
     QSignalSpy spy(controller, &Controller::connectionState);
     controller->handleConnectClick();
     spy.wait();
