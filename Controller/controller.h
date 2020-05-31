@@ -43,6 +43,8 @@ private:
     QString m_host;
     unsigned m_port;
     unsigned m_timeout_ms;
+
+    mpd_connection *m_connection;
 private slots:
     void setMPD(MPDConnection *);
 };
