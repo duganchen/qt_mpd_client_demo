@@ -77,21 +77,21 @@ QString Controller::host()
 
 void Controller::setMPD(MPDConnection *mpd)
 {
-    m_connection = mpd->connection();
-    m_notifier = mpd->notifier();
-
-    if (!mpd || mpd->isNull()) {
-        // The first condition should never happens. The second means we're out of memory.
+    if (!mpd->connection()) {
+        // OOM
         emit unrecoverableError();
     }
 
-    if (m_mpd) {
-        delete m_mpd;
+    if (m_connection) {
+        mpd_connection_free(m_connection);
     }
 
     m_mpd = mpd;
 
-    if (m_mpd->error() == MPD_ERROR_SUCCESS) {
+    m_connection = mpd->connection();
+    m_notifier = mpd->notifier();
+
+    if (mpd_connection_get_error(m_connection) == MPD_ERROR_SUCCESS) {
         emit connectionState(ConnectionState::Connected);
 
         connect(mpd, &MPDConnection::idle, this, &Controller::handleIdle);
