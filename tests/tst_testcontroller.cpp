@@ -48,9 +48,6 @@ void TestController::cleanup()
 void TestController::test_theTest()
 {
     QCOMPARE(m_mpdProcess->mpdState(), QProcess::Running);
-    if (m_mpdProcess->mpdState() != QProcess::Running) {
-        return;
-    }
 
     QCOMPARE(m_mpdProcess->mpdError(), MPD_ERROR_SUCCESS);
     if (m_mpdProcess->mpdError() != MPD_ERROR_SUCCESS) {

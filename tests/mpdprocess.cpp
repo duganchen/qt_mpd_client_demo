@@ -44,6 +44,10 @@ MPDProcess::MPDProcess(QObject *parent)
 
     QTest::qWait(MPD_START_MS);
 
+    if (m_mpdProc->state() != QProcess::Running) {
+        qDebug() << m_mpdProc->errorString();
+    }
+
     m_socketPath = m_temp.path() + "/socket";
     auto conn = mpd_connection_new(m_socketPath.toUtf8().constData(), 0, 0);
     QVERIFY(conn);
