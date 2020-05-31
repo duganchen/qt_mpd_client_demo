@@ -28,7 +28,7 @@ void Controller::handleConnectClick()
 
 void Controller::handleListAlbumsClick()
 {
-    if (!m_mpd || m_mpd->isNull()) {
+    if (!m_connection) {
         return;
     }
 
@@ -106,9 +106,11 @@ void Controller::setMPD(MPDConnection *mpd)
     if (mpd_connection_get_error(m_connection) == MPD_ERROR_SUCCESS) {
         emit connectionState(ConnectionState::Connected);
 
+#if 0
         connect(mpd, &MPDConnection::idle, this, &Controller::handleIdle);
+#endif
     } else {
-        qDebug() << m_mpd->error_message();
+        qDebug() << mpd_connection_get_error_message(m_connection);
         emit connectionState(ConnectionState::Disconnected);
     }
 }

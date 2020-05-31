@@ -5,7 +5,9 @@
 
 MPDConnection::MPDConnection(QString host, unsigned port, unsigned timeout_ms, QObject *parent)
     : QObject(parent)
+#if 0
     , m_notifier(nullptr)
+#endif
 {
     // Note: This DOES block long enough to become a problem!
     m_mpd = mpd_connection_new(host.toUtf8().constData(), port, timeout_ms);
@@ -19,6 +21,7 @@ MPDConnection::MPDConnection(QString host, unsigned port, unsigned timeout_ms, Q
 #endif
 }
 
+#if 0
 MPDConnection::~MPDConnection()
 {
     qDebug() << "Deleting the connection";
@@ -88,11 +91,12 @@ QVector<const char *> MPDConnection::search_db_tags(mpd_tag_type type)
 
     return tags;
 }
-
+#endif
 mpd_connection *MPDConnection::connection()
 {
     return m_mpd;
 }
+#if 0
 
 QSocketNotifier *MPDConnection::notifier()
 {
@@ -103,3 +107,4 @@ void MPDConnection::handleActivation()
 {
     emit idle(mpd_recv_idle(m_mpd, false));
 }
+#endif
