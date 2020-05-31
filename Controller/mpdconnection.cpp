@@ -88,6 +88,11 @@ QVector<const char *> MPDConnection::search_db_tags(mpd_tag_type type)
     return tags;
 }
 
+mpd_connection *MPDConnection::connection()
+{
+    return m_mpd;
+}
+
 void MPDConnection::handleActivation()
 {
     emit idle(mpd_recv_idle(m_mpd, false));

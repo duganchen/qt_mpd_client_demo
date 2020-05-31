@@ -20,6 +20,8 @@ public:
     mpd_idle run_noidle();
     QVector<const char *> search_db_tags(mpd_tag_type);
 
+    mpd_connection *connection();
+
 signals:
     void idle(mpd_idle);
 
