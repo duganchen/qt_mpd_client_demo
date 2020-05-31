@@ -90,10 +90,6 @@ void Controller::setMPD(MPDConnection *mpd)
 
     m_connection = mpd->connection();
 
-#if 0
-    m_notifier = mpd->notifier();
-#endif
-
     if (mpd_connection_get_error(m_connection) == MPD_ERROR_SUCCESS) {
         qDebug() << "Creating the socket notifier";
         m_notifier = new QSocketNotifier(mpd_connection_get_fd(m_connection),
@@ -106,9 +102,6 @@ void Controller::setMPD(MPDConnection *mpd)
     if (mpd_connection_get_error(m_connection) == MPD_ERROR_SUCCESS) {
         emit connectionState(ConnectionState::Connected);
 
-#if 0
-        connect(mpd, &MPDConnection::idle, this, &Controller::handleIdle);
-#endif
     } else {
         qDebug() << mpd_connection_get_error_message(m_connection);
         emit connectionState(ConnectionState::Disconnected);
