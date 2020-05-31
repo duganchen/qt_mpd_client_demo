@@ -46,6 +46,11 @@ QVector<QString> Controller::getAlbumList()
     return albums;
 }
 
+QString Controller::host()
+{
+    return m_host;
+}
+
 void Controller::setMPD(MPDConnection *mpd)
 {
     if (!mpd || mpd->isNull()) {
@@ -82,5 +87,10 @@ void Controller::handleIdle(mpd_idle idle)
         delete m_mpd;
         m_mpd = nullptr;
         emit connectionState(ConnectionState::Disconnected);
+    }
+
+    if (idle & MPD_IDLE_QUEUE) {
+        qDebug() << "THE QUEUE HAS CHANGED";
+        emit queueChanged();
     }
 }

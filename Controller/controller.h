@@ -21,6 +21,8 @@ public slots:
 
 public:
     QVector<QString> getAlbumList();
+
+    QString host();
 signals:
     void errorMessage(QString);
     void connectionState(Controller::ConnectionState connectionState);
@@ -31,6 +33,8 @@ signals:
     void endMPDCommand();
 
     void unrecoverableError();
+
+    void queueChanged();
 
 private:
     void handleIdle(mpd_idle);
