@@ -13,9 +13,9 @@ public:
     ~ConnectionManager();
 public slots:
     void createConnection(QString, unsigned, unsigned);
-    void setMPD(MPDConnection *);
+    void setMPD(MPDSignalCarrier *);
 signals:
-    void mpd(MPDConnection *);
+    void mpd(MPDSignalCarrier *);
     void requestConnectionFromFactory(QString, unsigned, unsigned);
 
 private:

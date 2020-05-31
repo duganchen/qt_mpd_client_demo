@@ -32,7 +32,7 @@ void ConnectionManager::createConnection(QString host, unsigned port, unsigned t
     emit requestConnectionFromFactory(host, port, timeout_ms);
 }
 
-void ConnectionManager::setMPD(MPDConnection *conn)
+void ConnectionManager::setMPD(MPDSignalCarrier *conn)
 {
     emit mpd(conn);
 }

@@ -74,7 +74,7 @@ QString Controller::host()
     return m_host;
 }
 
-void Controller::setMPD(MPDConnection *mpd)
+void Controller::setMPD(MPDSignalCarrier *mpd)
 {
     mpd_connection *connection = mpd->connection();
     delete mpd;

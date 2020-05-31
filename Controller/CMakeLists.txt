@@ -17,7 +17,7 @@ pkg_check_modules(LIBMPDCLIENT REQUIRED IMPORTED_TARGET libmpdclient)
 
 add_library(Controller SHARED
   controller.cpp
-  mpdconnection.cpp
+  mpdsignalcarrier.cpp
   mpdconnectionfactory.cpp
   connectionmanager.cpp
 )

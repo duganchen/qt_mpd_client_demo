@@ -1,8 +1,9 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "mpdconnection.h"
+#include "mpdsignalcarrier.h"
 #include <QObject>
+#include <QSocketNotifier>
 
 #include "Controller_global.h"
 
@@ -46,7 +47,7 @@ private:
     mpd_connection *m_connection;
     QSocketNotifier *m_notifier;
 private slots:
-    void setMPD(MPDConnection *);
+    void setMPD(MPDSignalCarrier *);
 
     void handleActivation();
 };

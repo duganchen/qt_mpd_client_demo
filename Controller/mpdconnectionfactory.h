@@ -1,7 +1,7 @@
 #ifndef MPDCONNECTIONFACTORY_H
 #define MPDCONNECTIONFACTORY_H
 
-#include "mpdconnection.h"
+#include "mpdsignalcarrier.h"
 #include <QObject>
 
 class MPDConnectionFactory : public QObject
@@ -12,7 +12,7 @@ public:
 public slots:
     void createConnection(QString, unsigned, unsigned);
 signals:
-    void mpd(MPDConnection *);
+    void mpd(MPDSignalCarrier *);
 };
 
 #endif // MPDCONNECTIONFACTORY_H
