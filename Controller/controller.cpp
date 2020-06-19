@@ -43,11 +43,9 @@ void Controller::handleConnectClick()
 
         socket->connectToHost(m_host, m_port);
         if (socket->waitForConnected(m_timeout_ms)) {
-            qDebug() << "Attempting to connect";
             socket->deleteLater();
             emit requestConnection(m_host, m_port, m_timeout_ms);
         } else {
-            qDebug() << "We're disconnected";
             socket->deleteLater();
             emit connectionState(ConnectionState::Disconnected);
         }
