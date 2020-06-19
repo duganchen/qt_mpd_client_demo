@@ -1,6 +1,9 @@
 #include "controller.h"
 #include "connectionmanager.h"
 #include <QDebug>
+#include <QtNetwork/QHostInfo>
+#include <QtNetwork/QLocalSocket>
+#include <QtNetwork/QTcpSocket>
 
 Controller::Controller(QString host, unsigned port, unsigned timeout_ms, QObject *parent)
     : QObject(parent)
@@ -22,7 +25,76 @@ Controller::Controller(QString host, unsigned port, unsigned timeout_ms, QObject
 
 void Controller::handleConnectClick()
 {
-    emit requestConnection(m_host, m_port, m_timeout_ms);
+    qDebug() << "m_host is " << m_host;
+    qDebug() << "m_host at 0 is " << m_host.at(0);
+    if (m_host.startsWith("/") || m_host.startsWith("@")) {
+        qDebug() << "We're making a local socket";
+        QLocalSocket *socket = new QLocalSocket();
+        connect(socket, &QLocalSocket::connected, [=]() {
+            qDebug() << "The local socket was connected";
+            socket->disconnectFromServer();
+            socket->deleteLater();
+            // emit requestConnection(m_host, m_port, m_timeout_ms);
+        });
+
+        connect(socket,
+                &QLocalSocket::errorOccurred,
+                [=](QLocalSocket::LocalSocketError socketError) {
+                    Q_UNUSED(socketError);
+                    qDebug() << "Tehre was a socket error";
+                    emit connectionState(ConnectionState::Disconnected);
+                });
+        qDebug() << "The local socket test attempst to connect";
+        socket->connectToServer(m_host);
+        qDebug() << "The local socket test makes the connection";
+    } else {
+        qDebug() << "No, it's a TCP";
+
+        auto socket = new QTcpSocket();
+#if 0
+        connect(socket, &QTcpSocket::connected, [=]() {
+            qDebug() << "We are connected";
+            socket->disconnectFromHost();
+            socket->deleteLater();
+            emit requestConnection(m_host, m_port, m_timeout_ms);
+        });
+        connect(socket, &QTcpSocket::errorOccurred, [=](QTcpSocket::SocketError socketError) {
+            qDebug() << "An error occurred";
+            Q_UNUSED(socketError);
+            socket->deleteLater();
+            emit connectionState(ConnectionState::Disconnected);
+        });
+        qDebug() << "Attempting to connect the socket";
+#endif
+        socket->connectToHost(m_host, m_port);
+        if (socket->waitForConnected(m_timeout_ms)) {
+            emit requestConnection(m_host, m_port, m_timeout_ms);
+        } else {
+            emit connectionState(ConnectionState::Disconnected);
+        }
+
+#if 0
+        QHostInfo::lookupHost(m_host, [=](QHostInfo &info) {
+            qDebug() << "Host is looked up";
+            if (info.error() == QHostInfo::NoError) {
+                qDebug() << "host is looked up without error";
+                auto socket = new QTcpSocket();
+                connect(socket, &QTcpSocket::connected, [=]() {
+                    qDebug() << "We are connected";
+                    socket->disconnectFromHost();
+                    socket->deleteLater();
+                    // emit requestConnection(m_host, m_port, m_timeout_ms);
+                });
+                qDebug() << "Attempting to connect the socket";
+                socket->connectToHost(m_host, m_port);
+            } else {
+                qDebug() << "There was a host error";
+                emit connectionState(ConnectionState::Disconnected);
+            }
+
+        });
+#endif
+    }
 }
 
 void Controller::handleListAlbumsClick()

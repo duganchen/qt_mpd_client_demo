@@ -17,7 +17,9 @@ public:
     ~TestConnection();
 
 private slots:
+#if 0
     void test_spinUpMPD();
+#endif
     void test_cannotConnect();
 };
 
@@ -27,17 +29,19 @@ TestConnection::~TestConnection() {}
 
 void TestConnection::test_cannotConnect()
 {
-    // Note deliberate typo.
     auto controller = new Controller("locahost", 6600, 0);
-
     QSignalSpy spy(controller, &Controller::connectionState);
     controller->handleConnectClick();
-    spy.wait();
+    spy.wait(5000);
+    qDebug() << "A signal or timeout was received";
+    qDebug() << spy.count();
+    qDebug() << spy[0];
     auto endState = spy[0][0].value<Controller::ConnectionState>();
     QCOMPARE(endState, Controller::ConnectionState::Disconnected);
     delete controller;
 }
 
+#if 0
 void TestConnection::test_spinUpMPD()
 {
     auto proc = new MPDProcess();
@@ -64,6 +68,7 @@ void TestConnection::test_spinUpMPD()
     spy.wait();
     endState = spy.takeLast()[0].value<Controller::ConnectionState>();
 }
+#endif
 
 QTEST_MAIN(TestConnection)
 
