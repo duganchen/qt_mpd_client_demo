@@ -31,6 +31,7 @@ void Controller::handleConnectClick()
 
         connect(socket, &QLocalSocket::errorOccurred, [=](QLocalSocket::LocalSocketError error) {
             Q_UNUSED(error);
+            emit errorMessage(socket->errorString());
             socket->deleteLater();
             emit connectionState(ConnectionState::Disconnected);
         });
@@ -47,6 +48,7 @@ void Controller::handleConnectClick()
 
         connect(socket, &QTcpSocket::errorOccurred, [=](QTcpSocket::SocketError error) {
             Q_UNUSED(error);
+            emit errorMessage(socket->errorString());
             socket->deleteLater();
             emit connectionState(ConnectionState::Disconnected);
         });

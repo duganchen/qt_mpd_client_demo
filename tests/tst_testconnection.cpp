@@ -30,12 +30,11 @@ TestConnection::~TestConnection() {}
 void TestConnection::test_cannotConnect()
 {
     auto controller = new Controller("locahost", 6600, 200);
-    QSignalSpy spy(controller, &Controller::connectionState);
+    QSignalSpy spy(controller, &Controller::errorMessage);
     controller->handleConnectClick();
     // On my Fedora 32 box, it takes around 7 seconds to time out.
     spy.wait(10000);
-    auto endState = spy.last()[0].value<Controller::ConnectionState>();
-    QCOMPARE(endState, Controller::ConnectionState::Disconnected);
+    QCOMPARE(spy.last()[0].value<QString>(), QString{"Host not found"});
     delete controller;
 }
 
