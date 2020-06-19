@@ -27,14 +27,12 @@ TestConnection::~TestConnection() {}
 
 void TestConnection::test_cannotConnect()
 {
-    // Note deliberate typo.
-    auto controller = new Controller("locahost", 6600, 0);
-
-    QSignalSpy spy(controller, &Controller::connectionState);
+    auto controller = new Controller("locahost", 6600, 200);
+    QSignalSpy spy(controller, &Controller::errorMessage);
     controller->handleConnectClick();
-    spy.wait();
-    auto endState = spy[0][0].value<Controller::ConnectionState>();
-    QCOMPARE(endState, Controller::ConnectionState::Disconnected);
+    // On my Fedora 32 box, it takes around 7 seconds to time out.
+    spy.wait(10000);
+    QCOMPARE(spy.last()[0].value<QString>(), QString{"Host not found"});
     delete controller;
 }
 
@@ -56,13 +54,11 @@ void TestConnection::test_spinUpMPD()
     QSignalSpy spy(&controller, &Controller::connectionState);
     controller.handleConnectClick();
     spy.wait();
-    auto endState = spy[0][0].value<Controller::ConnectionState>();
-    QCOMPARE(endState, Controller::ConnectionState::Connected);
-
-    delete proc;
-
     spy.wait();
-    endState = spy.takeLast()[0].value<Controller::ConnectionState>();
+    auto endState = spy.last()[0].value<Controller::ConnectionState>();
+
+    QCOMPARE(endState, Controller::ConnectionState::Connected);
+    delete proc;
 }
 
 QTEST_MAIN(TestConnection)

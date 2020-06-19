@@ -87,6 +87,7 @@ void TestController::test_theTest()
     albums = controller.getAlbumList();
     QCOMPARE(albums[0], "Touhou Luna Nights - Original Soundtrack");
 }
+
 QTEST_MAIN(TestController)
 
 #include "tst_testcontroller.moc"

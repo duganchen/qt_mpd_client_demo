@@ -1,11 +1,13 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#if 0
 #include "mpdsignalcarrier.h"
+#endif
+#include "Controller_global.h"
+#include <mpd/client.h>
 #include <QObject>
 #include <QSocketNotifier>
-
-#include "Controller_global.h"
 
 class CONTROLLER_EXPORT Controller : public QObject
 {
@@ -39,6 +41,7 @@ signals:
 
 private:
     void handleIdle(mpd_idle);
+    void createMPD();
 
     QString m_host;
     unsigned m_port;
@@ -47,8 +50,9 @@ private:
     mpd_connection *m_connection;
     QSocketNotifier *m_notifier;
 private slots:
+#if 0
     void setMPD(MPDSignalCarrier *);
-
+#endif
     void handleActivation();
 };
 
