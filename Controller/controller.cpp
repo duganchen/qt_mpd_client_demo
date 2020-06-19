@@ -27,32 +27,36 @@ void Controller::handleConnectClick()
     emit connectionState(ConnectionState::Connecting);
 
     if (m_host.startsWith("/") || m_host.startsWith("@")) {
-        auto localSocket = new QLocalSocket();
+        auto socket = new QLocalSocket();
 
-        localSocket->connectToServer(m_host);
-        if (localSocket->waitForConnected(m_timeout_ms)) {
-            localSocket->disconnectFromServer();
-            localSocket->waitForDisconnected();
-            localSocket->deleteLater();
-            emit requestConnection(m_host, m_port, m_timeout_ms);
-        } else {
-            localSocket->deleteLater();
+        connect(socket, &QLocalSocket::errorOccurred, [=](QLocalSocket::LocalSocketError error) {
+            Q_UNUSED(error);
+            socket->deleteLater();
             emit connectionState(ConnectionState::Disconnected);
-        }
+        });
+
+        connect(socket, &QLocalSocket::connected, [=]() {
+            connect(socket, &QLocalSocket::disconnected, [=]() { socket->deleteLater(); });
+            socket->disconnectFromServer();
+        });
+
+        socket->connectToServer(m_host);
 
     } else {
         auto socket = new QTcpSocket();
 
-        socket->connectToHost(m_host, m_port);
-        if (socket->waitForConnected(m_timeout_ms)) {
-            socket->disconnectFromHost();
-            socket->waitForDisconnected();
-            socket->deleteLater();
-            emit requestConnection(m_host, m_port, m_timeout_ms);
-        } else {
+        connect(socket, &QTcpSocket::errorOccurred, [=](QTcpSocket::SocketError error) {
+            Q_UNUSED(error);
             socket->deleteLater();
             emit connectionState(ConnectionState::Disconnected);
-        }
+        });
+
+        connect(socket, &QTcpSocket::connected, [=]() {
+            connect(socket, &QTcpSocket::disconnected, [=]() { socket->deleteLater(); });
+            socket->disconnectFromHost();
+        });
+
+        socket->connectToHost(m_host, m_port);
     }
 }
 
