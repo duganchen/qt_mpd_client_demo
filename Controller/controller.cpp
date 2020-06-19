@@ -25,6 +25,8 @@ Controller::Controller(QString host, unsigned port, unsigned timeout_ms, QObject
 
 void Controller::handleConnectClick()
 {
+    emit connectionState(ConnectionState::Connecting);
+
     qDebug() << "m_host is " << m_host;
     qDebug() << "m_host at 0 is " << m_host.at(0);
     if (m_host.startsWith("/") || m_host.startsWith("@")) {
@@ -68,8 +70,10 @@ void Controller::handleConnectClick()
 #endif
         socket->connectToHost(m_host, m_port);
         if (socket->waitForConnected(m_timeout_ms)) {
+            qDebug() << "Attempting to connect";
             emit requestConnection(m_host, m_port, m_timeout_ms);
         } else {
+            qDebug() << "We're disconnected";
             emit connectionState(ConnectionState::Disconnected);
         }
 

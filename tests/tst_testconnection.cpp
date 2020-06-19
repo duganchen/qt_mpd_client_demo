@@ -32,11 +32,7 @@ void TestConnection::test_cannotConnect()
     auto controller = new Controller("locahost", 6600, 0);
     QSignalSpy spy(controller, &Controller::connectionState);
     controller->handleConnectClick();
-    spy.wait(5000);
-    qDebug() << "A signal or timeout was received";
-    qDebug() << spy.count();
-    qDebug() << spy[0];
-    auto endState = spy[0][0].value<Controller::ConnectionState>();
+    auto endState = spy.last()[0].value<Controller::ConnectionState>();
     QCOMPARE(endState, Controller::ConnectionState::Disconnected);
     delete controller;
 }
