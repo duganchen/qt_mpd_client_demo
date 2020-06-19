@@ -27,14 +27,16 @@ void Controller::handleConnectClick()
     emit connectionState(ConnectionState::Connecting);
 
     if (m_host.startsWith("/") || m_host.startsWith("@")) {
-        auto socket = new QLocalSocket();
+        auto localSocket = new QLocalSocket();
 
-        socket->connectToServer(m_host);
-        if (socket->waitForConnected(m_timeout_ms)) {
-            socket->deleteLater();
+        localSocket->connectToServer(m_host);
+        if (localSocket->waitForConnected(m_timeout_ms)) {
+            localSocket->disconnectFromServer();
+            localSocket->waitForDisconnected();
+            localSocket->deleteLater();
             emit requestConnection(m_host, m_port, m_timeout_ms);
         } else {
-            socket->deleteLater();
+            localSocket->deleteLater();
             emit connectionState(ConnectionState::Disconnected);
         }
 
@@ -43,6 +45,8 @@ void Controller::handleConnectClick()
 
         socket->connectToHost(m_host, m_port);
         if (socket->waitForConnected(m_timeout_ms)) {
+            socket->disconnectFromHost();
+            socket->waitForDisconnected();
             socket->deleteLater();
             emit requestConnection(m_host, m_port, m_timeout_ms);
         } else {
